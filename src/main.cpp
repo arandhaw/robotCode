@@ -1,11 +1,12 @@
 #include <Arduino.h>
-#include "testMotors.h" //header files to be included
+#include "runMotors.h" //self made files 
+// #include "testMotors.h" 
 
 
 void setup(){
-  setup_testMotors();
+  setup_runMotors();
 }
 
 void loop(){
-  loop_testMotors();
+  loop_runMotors();
 }
