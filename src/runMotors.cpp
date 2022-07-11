@@ -37,14 +37,14 @@ void setup_OLED() {
 }
 
 //updates OLED once
-void OLED(int dutycycle) {
+void OLED(String str, int num) {
     
     display_handler.clearDisplay();
     display_handler.setCursor(0,0); //sets location of cursor (x, y)
     display_handler.println("Loop Counter: ");
     display_handler.println(j);
-    display_handler.println("Duty cycle:");
-    display_handler.println(dutycycle);
+    display_handler.println(str);
+    display_handler.println(num);
     display_handler.display();
     j++;
     delay(10);
@@ -65,7 +65,7 @@ void setup_runMotors(){
 
 //loop function - run in master loop
 void loop_runMotors(){
-  OLED(dutycycle);
+  OLED("Dutycycle:", dutycycle);
   motor1.powerMotor(45, dir);
   motor2.powerMotor(45, !dir);
   delay(2000);
