@@ -4,8 +4,6 @@
 
 void loop_runMotors();
 void setup_runMotors();
-void setup_OLED();
-void OLED(String str, int num);
 //any functions you want to use in main program
 
 #endif
