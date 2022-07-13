@@ -11,7 +11,7 @@ Motor::Motor(int forward_pin, PinName forward_pin_, int reverse_pin, PinName rev
     }
 
 void Motor::PWM(int dutycycle, PinName pin){
-      uint32_t frequency_Hz = 100000;
+      uint32_t frequency_Hz = 100000; // Maybe change this?
       pwm_start(pin, frequency_Hz, dutycycle,
       TimerCompareFormat_t::PERCENT_COMPARE_FORMAT);
     }

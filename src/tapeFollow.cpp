@@ -1,6 +1,6 @@
 #include "tapeFollow.h"
-#define KP 3
-#define KD 9
+#define KP 10
+#define KD 0
 #define KI 0
 #define KI_MAX 10
 #define SPEED 42
@@ -33,18 +33,22 @@ int getError(ReflectSensor R1, ReflectSensor R2, ReflectSensor R3, int lastError
             return 3;
         if(lastError == -2)
             return -3;
+        if(lastError == 3)
+            return 3;
+        if(lastError == -3)
+            return -3;
     }
     return -100;
 }
 
 void PID(ReflectSensor R1, ReflectSensor R2, ReflectSensor R3, Motor leftMotor, Motor rightMotor){
     int error = getError(R1, R2, R3, lastError);
-    if (error == -100){
-        OLED("Indeterminate State", -100);
-        failSafe++;
-        if(failSafe > FAIL_LIMIT){  failure(leftMotor, rightMotor);  }
-        return;
-    } else { failSafe = 0; }
+    // if (error == -100){
+    //     OLED("Indeterminate State", -100);
+    //     failSafe++;
+    //     if(failSafe > FAIL_LIMIT){  failure(leftMotor, rightMotor);  } //Mayvb comment out
+    //     return;
+    // } else { failSafe = 0; }
 
     dError = error - lastError;
     summedError += error;
@@ -54,9 +58,9 @@ void PID(ReflectSensor R1, ReflectSensor R2, ReflectSensor R3, Motor leftMotor, 
     if(summedError*KI < KI_MAX)
         iError = -KI_MAX;
 
-    int adjustment = error*KD + iError + dError*KD;
-    //leftMotor.powerMotor(SPEED - adjustment, true);
-    //rightMotor.powerMotor(SPEED + adjustment + 10, true);
+    int adjustment = error*KP + iError + dError*KD;
+    leftMotor.powerMotor(SPEED + adjustment, true); //Switched + and - direction
+    rightMotor.powerMotor(SPEED - adjustment, true); //Switched + and - direction
 
     OLED("Detected error:", error);
     //OLED_manuel(error, adjustment, 0);
