@@ -41,21 +41,18 @@ void OLED(String str, int num) {
 }
 
 //updates OLED once
-void OLED_manual(int a, int b, int c) {
+void OLED_manual(int a, int b, int c, int d) {
     
     display_handler.clearDisplay();
     display_handler.setCursor(0,0); //sets location of cursor (x, y)
-    display_handler.println("Loop Counter: ");
-    display_handler.println(OLEDcounter);
-    display_handler.println("Error");
-    display_handler.println(a);
-    display_handler.println("Motor direction:");
-    if(b > 0){
-      display_handler.println("go left");
-    }
-    if(b < 0){
-      display_handler.println("go right");
-    }
+    display_handler.println("Encoder 1:");
+    display_handler.print(a);
+    display_handler.print(", ");
+    display_handler.println(b);
+    display_handler.println("Encoder 2: ");
+    display_handler.print(c);
+    display_handler.print(", ");
+    display_handler.println(d);
     display_handler.display();
     OLEDcounter++;
 }
