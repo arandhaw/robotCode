@@ -1,6 +1,7 @@
 #ifndef STM32encoder_h
 #define STM32encoder_h
 
+//see https://github.com/gianni-carbone/STM32encoder for documentation
 #include "Arduino.h"
 #include "stm32yyxx_hal_conf.h"
 #include <cfloat>					// for float and double boundaries

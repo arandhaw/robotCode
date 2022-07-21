@@ -21,6 +21,7 @@ class Motor {
     Motor(int forward_pin, PinName forward_pin_, int reverse_pin, PinName reverse_pin_);
     //function that drives motor
     void powerMotor(int dutycycle, bool direction);
+    void powerMotor(int dutycycle);
 };
 
 #endif

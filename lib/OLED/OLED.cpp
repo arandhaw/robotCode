@@ -15,7 +15,6 @@ void setup_OLED() {
  
   // Displays Adafruit logo by default. call clearDisplay immediately if you don't want this.
   display_handler.display();
-  delay(2000);
 
   // Displays "Hello world!" on the screen
   display_handler.clearDisplay();
@@ -45,13 +44,13 @@ void OLED_manual(int a, int b, int c, int d) {
     
     display_handler.clearDisplay();
     display_handler.setCursor(0,0); //sets location of cursor (x, y)
-    display_handler.println("Encoder 1:");
-    display_handler.print(a);
-    display_handler.print(", ");
+    display_handler.println("Encoder 1 pos");
+    display_handler.println(a);
+    display_handler.println("Encoder 1 count");
     display_handler.println(b);
-    display_handler.println("Encoder 2: ");
-    display_handler.print(c);
-    display_handler.print(", ");
+    display_handler.println("Encoder 2 pos");
+    display_handler.println(c);
+    display_handler.println("Encoder 2 count");
     display_handler.println(d);
     display_handler.display();
     OLEDcounter++;
@@ -72,3 +71,14 @@ void OLED_manual2(int a, int b, int c) {
     OLEDcounter++;
 }
 
+//updates OLED once
+void OLED_manual3(float a, float b, float c) {
+    
+    display_handler.clearDisplay();
+    display_handler.setCursor(0,0); //sets location of cursor (x, y)
+    display_handler.println(a);
+    display_handler.println(b);
+    display_handler.println(c);
+    display_handler.display();
+    OLEDcounter++;
+}

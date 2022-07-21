@@ -14,10 +14,15 @@ class Encoder{
     private:
         int pin1, pin2;
         int num;
+        void calibrate();
         
     public:
         Encoder(int pin1, int pin2, int num);
-        int getSpeed();
-        int getPosition();
+        int getAvgSpeed();
+        float getSpeed();
+        int getPos();
+        int getCount();
+        void reset();
+        void testCounters();
 };
 #endif
