@@ -18,6 +18,8 @@ volatile bool b1 = false;
 volatile bool b2 = false;
 volatile bool b3 = false;
 volatile bool b4 = false;
+volatile bool dir1;
+volatile bool dir2;
 
 void handle_interrupt1(){
     count1++;
@@ -27,9 +29,11 @@ void handle_interrupt1(){
     }
     if(b2 == false){
         pos1++;
+        dir1 = true;
     }
     if(b2 == true){
         pos1--;
+        dir1 = false;
     }
 }
 void handle_interrupt2(){
@@ -44,9 +48,11 @@ void handle_interrupt3(){
     }
     if(b4 == false){
         pos2++;
+        dir2 = true;
     }
     if(b4 == true){
         pos2--;
+        dir2 = false;
     }
 }
 void handle_interrupt4(){
@@ -105,27 +111,43 @@ void Encoder::reset(){
     count3 = 0;
     count4 = 0;
 
-    int pos1 = 0;
-    int pos2 = 0;
+    pos1 = 0;
+    pos2 = 0;
 
-    int lastTime1 = 1000; 
-    int secondLastTime1 = 0; 
-    int lastTime2 = 0; 
-    int secondLastTime2 = 1000; 
+    lastTime1 = 1000; 
+    secondLastTime1 = 0; 
+    lastTime2 = 0; 
+    secondLastTime2 = 1000; 
 }
 
 float Encoder::getSpeed(){
     int dt;
+    bool direction;
+    float timeSinceLastClick;
     if(num == 1){   
         noInterrupts();
         dt = lastTime1 - secondLastTime1; //time between pulses in microseconds
+        timeSinceLastClick = lastTime1;
         interrupts();
+        direction = dir1;
+        
     } if(num == 2){
         noInterrupts();
         dt = lastTime2 - secondLastTime2; //time between pulses in microseconds
+        timeSinceLastClick = lastTime2;
         interrupts();
+        direction = dir2;
+        
     }
-    return (float) 100000/dt; //speed in clicks per 10 ms
+    if(micros() - timeSinceLastClick > 50000){
+        return 0; 
+    }
+    float speed = (float) 100000/dt; //speed in clicks per 10 ms
+    if(direction == true){
+        return speed;
+    } else {
+        return -speed; //speed in clicks per 10 ms
+    }
 }
 
 //gives speed of encoder. takes 10 milliseconds to run
@@ -169,5 +191,5 @@ int Encoder::getCount(){
 }
 
 void Encoder::testCounters(){
-    OLED_manual(count1, count2, count3, count4);
+    OLED_manual(count1, count2/2, count3, count4/2);
 }

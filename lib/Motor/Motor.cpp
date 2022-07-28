@@ -17,17 +17,32 @@ void Motor::PWM(int dutycycle, PinName pin){
     }
 
 void Motor::powerMotor(int dutycycle, bool direction){
-      if (direction == true){
-        PWM(0, reverse_pin_);
-        PWM(dutycycle, forward_pin_);
-      }
-      else{
-        PWM(0, forward_pin_);
-        PWM(dutycycle, reverse_pin_);
-      }
+    if(dutycycle < 0){ 
+      PWM(0, reverse_pin_);
+      PWM(0, forward_pin_);
+      return; 
+    }
+    if(dutycycle > 100){ 
+      dutycycle = 100;
     }
 
+    if (direction == true){
+      PWM(0, reverse_pin_);
+      PWM(dutycycle, forward_pin_);
+    }
+    else{
+      PWM(0, forward_pin_);
+      PWM(dutycycle, reverse_pin_);
+    }
+}
+
 void Motor::powerMotor(int dutycycle){
+      if(dutycycle > 100){
+        dutycycle = 100;
+      } else if ( dutycycle < -100){
+        dutycycle = -100; 
+      }
+
       if (dutycycle >= 0){
         PWM(0, reverse_pin_);
         PWM(dutycycle, forward_pin_);

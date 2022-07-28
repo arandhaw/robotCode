@@ -11,8 +11,10 @@ volatile int OLEDcounter = 0;
 Adafruit_SSD1306 display_handler(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 void setup_OLED() {
+  
+  Wire.setSCL(PB10);
+  Wire.setSDA(PB11);
   display_handler.begin(SSD1306_SWITCHCAPVCC, 0x3C);
- 
   // Displays Adafruit logo by default. call clearDisplay immediately if you don't want this.
   display_handler.display();
 
@@ -35,6 +37,17 @@ void OLED(String str, int num) {
     display_handler.println(OLEDcounter);
     display_handler.println(str);
     display_handler.println(num);
+    display_handler.display();
+    OLEDcounter++;
+}
+//updates OLED once
+void OLED2(String str, int a, int b) {
+    
+    display_handler.clearDisplay();
+    display_handler.setCursor(0,0); //sets location of cursor (x, y)
+    display_handler.println(str);
+    display_handler.println(a);
+    display_handler.println(b);
     display_handler.display();
     OLEDcounter++;
 }
