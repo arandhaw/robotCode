@@ -8,12 +8,12 @@
 #include "Tasks/tasks.h"
 #include "Motion/motion.h"
 #include "tapeFollow/tapeFollow.h"
+#include "tests/tests.h"
 
 // #include "runMotors.h" 
 // #include "testMotors.h" 
 
 //Servo myservo;
-
 
 ReflectSensor R1(PA7); //left
 ReflectSensor R2(PA6); //middle
@@ -23,6 +23,8 @@ Motor motor2(PA2, PA_2, PA3, PA_3); //left motor
 Encoder encoder2(PB15, PB14, 2);
 Encoder encoder1(PB12, PB13, 1);
 Sonar sonar_r(PB3, PA15);
+DataBuffer<int> sonar_data(5, 100);
+PID pid_tape_45(10, 0, 5, 0);
 
 void selfOptimize(){
   float arr[2][6];
@@ -50,46 +52,74 @@ void selfOptimize(){
   OLED2("Smallest Error:", arr[0][min], arr[1][min]);
 }
 
-DataBuffer<int> data(5, 100);
-PID pid_tape_45(10, 0, 0, 0);
+
 
 void setup(){
-  setup_OLED(); //2 seconds of delay within this function
+  setup_OLED(); 
+  
+  //2 seconds of delay within this function
   //rotate(false); //true turns right, false turns left
   //delay(500);
   //encoder1.reset();
   //encoder2.reset();
   //selfOptimize();
-  // PID pid1(30, 0, 0, 1000);
-  // while(goStraight2(pid1, cm_to_clicks(100), 40, encoder1, encoder2, motor1, motor2)){}
-
   // move(50);
   // rotate(180, true);
   // move(50);
-  pwm_start(PB_6, 100, 12, TimerCompareFormat_t::PERCENT_COMPARE_FORMAT);
+  //pwm_start(PB_6, 100, 12, TimerCompareFormat_t::PERCENT_COMPARE_FORMAT);
   
 }
 
-//
+int idol_num = 0; //global variable to keep track of state
+
 void loop(){
-  if( encoder1.getPos() < cm_to_clicks(180) ){
-    tapeFollow(pid_tape_45, 45, R1, R2, R3, motor1, motor2);
-  } else {
-    tapeFollow(pid_tape_45, 20, R1, R2, R3, motor1, motor2);
-    if(millis() - sonar_r.lastUse > 60){
-      int dist = sonar_r.getDistance();
-        if(dist < 25 && dist > 8){
-          delay(150);
-          stop_robot(); 
+  if(idol_num == 0){
+    if( encoder1.getPos() < cm_to_clicks(180)){
+      tapeFollow(pid_tape_45, 45, R1, R2, R3, motor1, motor2);
+    } else {
+      tapeFollow(pid_tape_45, 45, R1, R2, R3, motor1, motor2);
+      if(millis() - sonar_r.lastUse > 60){
+        sonar_data.add(sonar_r.getDistance());
+        int dist = sonar_data.get(0);
+        if(dist < 20 && dist > 8){
+          move(5);
           pickUpRight();
-          while(true){ stop_robot(); }
+          idol_num = 1;
+          encoder1.reset();
+          encoder2.reset();
         }
+      }
     }
   }
-  //motor1.powerMotor(20);
-  //motor2.powerMotor(100);
-  //OLED_manual(encoder1.getPos(), encoder1.getSpeed(), encoder2.getPos(), encoder2.getSpeed());
+  // } else if (idol_num = 1){
+  //   if( encoder1.getPos() < cm_to_clicks(60) ){
+  //     tapeFollow(pid_tape_45, 20, R1, R2, R3, motor1, motor2);
+  //   } else {
+  //     tapeFollow(pid_tape_45, 20, R1, R2, R3, motor1, motor2);
+  //     if(millis() - sonar_r.lastUse > 60){
+  //       sonar_data.add(sonar_r.getDistance());
+  //       if(sonar_data.runningAvg(2) < 25){
+  //         stop_robot(); 
+  //         pickUpRight();
+  //         idol_num = 2;
+  //         encoder1.reset();
+  //         encoder2.reset();
+  //       }
+  //     }
+  //   }
+
+  // } else if (idol_num == 2){
+  //   if(encoder1.getPos() < cm_to_clicks(50)){
+  //     tapeFollow(pid_tape_45, 20, R1, R2, R3, motor1, motor2);
+  //   } else {
+  //     stop_robot();
+  //   }
+  // }
+
+  // motor1.powerMotor(50);
+  // motor2.powerMotor(50);
   //OLED_manual(encoder1.getSpeed(), 0, encoder2.getSpeed(), 0);
   //encoder1.testCounters();
+  
   
 }

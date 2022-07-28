@@ -32,7 +32,7 @@ void setup_OLED() {
 void OLED(String str, int num) {
     
     display_handler.clearDisplay();
-    display_handler.setCursor(0,0); //sets location of cursor (x, y)
+    display_handler.setCursor(0,15); //sets location of cursor (x, y)
     display_handler.println("Loop Counter: ");
     display_handler.println(OLEDcounter);
     display_handler.println(str);
@@ -44,7 +44,7 @@ void OLED(String str, int num) {
 void OLED2(String str, int a, int b) {
     
     display_handler.clearDisplay();
-    display_handler.setCursor(0,0); //sets location of cursor (x, y)
+    display_handler.setCursor(0,15); //sets location of cursor (x, y)
     display_handler.println(str);
     display_handler.println(a);
     display_handler.println(b);
@@ -56,7 +56,7 @@ void OLED2(String str, int a, int b) {
 void OLED_manual(int a, int b, int c, int d) {
     
     display_handler.clearDisplay();
-    display_handler.setCursor(0,0); //sets location of cursor (x, y)
+    display_handler.setCursor(0,15); //sets location of cursor (x, y)
     display_handler.println("Encoder 1 pos");
     display_handler.println(a);
     display_handler.println("Encoder 1 count");
@@ -73,7 +73,7 @@ void OLED_manual(int a, int b, int c, int d) {
 void OLED_manual2(int a, int b, int c) {
     
     display_handler.clearDisplay();
-    display_handler.setCursor(0,0); //sets location of cursor (x, y)
+    display_handler.setCursor(0,15); //sets location of cursor (x, y)
     display_handler.println("Loop Counter: ");
     display_handler.println(OLEDcounter);
     display_handler.println("left to right:");
@@ -88,7 +88,7 @@ void OLED_manual2(int a, int b, int c) {
 void OLED_manual3(float a, float b, float c) {
     
     display_handler.clearDisplay();
-    display_handler.setCursor(0,0); //sets location of cursor (x, y)
+    display_handler.setCursor(0,15); //sets location of cursor (x, y)
     display_handler.println(a);
     display_handler.println(b);
     display_handler.println(c);
