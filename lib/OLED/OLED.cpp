@@ -11,11 +11,12 @@ volatile int OLEDcounter = 0;
 Adafruit_SSD1306 display_handler(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 void setup_OLED() {
+  
+  Wire.setSCL(PB10);
+  Wire.setSDA(PB11);
   display_handler.begin(SSD1306_SWITCHCAPVCC, 0x3C);
- 
   // Displays Adafruit logo by default. call clearDisplay immediately if you don't want this.
   display_handler.display();
-  delay(2000);
 
   // Displays "Hello world!" on the screen
   display_handler.clearDisplay();
@@ -31,7 +32,7 @@ void setup_OLED() {
 void OLED(String str, int num) {
     
     display_handler.clearDisplay();
-    display_handler.setCursor(0,0); //sets location of cursor (x, y)
+    display_handler.setCursor(0,15); //sets location of cursor (x, y)
     display_handler.println("Loop Counter: ");
     display_handler.println(OLEDcounter);
     display_handler.println(str);
@@ -39,23 +40,31 @@ void OLED(String str, int num) {
     display_handler.display();
     OLEDcounter++;
 }
-
 //updates OLED once
-void OLED_manual(int a, int b, int c) {
+void OLED2(String str, int a, int b) {
     
     display_handler.clearDisplay();
-    display_handler.setCursor(0,0); //sets location of cursor (x, y)
-    display_handler.println("Loop Counter: ");
-    display_handler.println(OLEDcounter);
-    display_handler.println("Error");
+    display_handler.setCursor(0,15); //sets location of cursor (x, y)
+    display_handler.println(str);
     display_handler.println(a);
-    display_handler.println("Motor direction:");
-    if(b > 0){
-      display_handler.println("go left");
-    }
-    if(b < 0){
-      display_handler.println("go right");
-    }
+    display_handler.println(b);
+    display_handler.display();
+    OLEDcounter++;
+}
+
+//updates OLED once
+void OLED_manual(int a, int b, int c, int d) {
+    
+    display_handler.clearDisplay();
+    display_handler.setCursor(0,15); //sets location of cursor (x, y)
+    display_handler.println("Encoder 1 pos");
+    display_handler.println(a);
+    display_handler.println("Encoder 1 count");
+    display_handler.println(b);
+    display_handler.println("Encoder 2 pos");
+    display_handler.println(c);
+    display_handler.println("Encoder 2 count");
+    display_handler.println(d);
     display_handler.display();
     OLEDcounter++;
 }
@@ -64,7 +73,7 @@ void OLED_manual(int a, int b, int c) {
 void OLED_manual2(int a, int b, int c) {
     
     display_handler.clearDisplay();
-    display_handler.setCursor(0,0); //sets location of cursor (x, y)
+    display_handler.setCursor(0,15); //sets location of cursor (x, y)
     display_handler.println("Loop Counter: ");
     display_handler.println(OLEDcounter);
     display_handler.println("left to right:");
@@ -75,3 +84,14 @@ void OLED_manual2(int a, int b, int c) {
     OLEDcounter++;
 }
 
+//updates OLED once
+void OLED_manual3(float a, float b, float c) {
+    
+    display_handler.clearDisplay();
+    display_handler.setCursor(0,15); //sets location of cursor (x, y)
+    display_handler.println(a);
+    display_handler.println(b);
+    display_handler.println(c);
+    display_handler.display();
+    OLEDcounter++;
+}
