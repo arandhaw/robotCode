@@ -1,41 +1,5 @@
 #include "motion.h"
-// #define KP 5
-int factor = 0;
-int power = 0; 
-#define DEAD_BAND 0
 
-//speed is an integer between 0 and 25 - an artificial speed scale based on 
-//encoder readings
-void goSpeed(PID &pid, int speed, Encoder enc, Motor m1){
-    //updating value of error, sumError, lastError, and total error
-    pid.lastError = pid.error;
-    pid.error = speed - enc.getSpeed();
-    pid.sumError = pid.sumError + pid.error;
-    pid.totalSquaredError += pid.error*pid.error;
-
-    power += round(pid.PIDValue());
-    m1.powerMotor(power);
-    OLED_manual3(enc.getSpeed(), pid.error, power);
-}
-
-bool goStraight(int speed, Encoder enc1, Encoder enc2, Motor m1, Motor m2){
-    if ((enc2.getPos() - enc1.getPos()) < -DEAD_BAND) {
-        // We are pointing too far to the right. Turn right motor on, left motor off.
-        m1.powerMotor(speed - 5);
-        m2.powerMotor(speed + 5);
-    } 
-    else if ((enc2.getPos() - enc1.getPos()) > DEAD_BAND){
-        // We are pointing too far to the left. Turn left motor on, right motor off.
-        m1.powerMotor(speed + 5);
-        m2.powerMotor(speed - 5);
-    }
-    else {
-        // Everything seems cool. Continue psuedo-straight.
-        m1.powerMotor(speed);
-        m2.powerMotor(speed);
-    }
-    return true;
-}
 
 bool goStraight2(PID &pid, int dist, int speed, Encoder enc1, Encoder enc2, Motor m1, Motor m2){
     if(dist - enc1.getPos() < 1000){
@@ -60,16 +24,13 @@ bool goStraight2(PID &pid, int dist, int speed, Encoder enc1, Encoder enc2, Moto
 
 //dir gives direction - spin right is ?? spin left is ??
 bool spin(PID &pid, int dist, int speed, bool dir, Encoder enc1, Encoder enc2, Motor m1, Motor m2){
-    if(dist - abs( enc1.getPos()) < 1000){
-         speed = round((  abs(dist) - abs( enc1.getPos()) )/1000*30 + (speed - 30)  );
-    }
+    // if(dist - abs( enc1.getPos()) < 1000){
+    //      speed = round((  abs(dist) - abs( enc1.getPos()) )/1000*30 + (speed - 30)  );
+    // }
 
     pid.lastError = pid.error;
-    if(dir = true){
-        
-    } else {
-        pid.error = abs(enc1.getSpeed()) - abs(enc2.getSpeed());
-    }
+    pid.error = abs(enc2.getSpeed()) - abs(enc1.getSpeed());
+    
 
     pid.sumError += pid.error;
     pid.totalSquaredError += pid.error*pid.error;
@@ -81,6 +42,27 @@ bool spin(PID &pid, int dist, int speed, bool dir, Encoder enc1, Encoder enc2, M
     if(abs( enc1.getPos() ) <= dist)
         return true;
     else {
+        return false;
+    }
+}
+
+bool goBack(PID &pid, int dist, int speed, Encoder enc1, Encoder enc2, Motor m1, Motor m2){
+    if(dist - abs(enc1.getPos()) < 1000){
+        speed = round( (dist - abs( enc1.getPos() ) )/1000*30 + (speed - 30)  );
+    }
+    pid.lastError = pid.error;
+    pid.error = enc1.getSpeed() - enc2.getSpeed();
+    pid.sumError += pid.error;
+    pid.totalSquaredError += pid.error*pid.error;
+
+    m1.powerMotor(speed + pid.PIDValue(), false);
+    m2.powerMotor(speed - pid.PIDValue(), false);
+    OLED_manual3(enc1.getSpeed(), pid.error, pid.totalSquaredError);
+    if(abs( enc1.getPos() )<= dist)
+        return true;
+    else {
+        m1.powerMotor(0);
+        m2.powerMotor(0);
         return false;
     }
 }
@@ -103,14 +85,48 @@ int cm_to_clicks(float cm){
   return round( 70*cm );
 }
 
+float clicks_to_cm(int clicks){
+  return (float) clicks/70 ;
+}
 
-  // for(int i = 1; i < 20; i++){
-  //   int start = millis();
-  //   while(millis() - start < 100){
-  //     goSpeed(pid1, i, encoder1, motor1);
-  //     goSpeed(pid2, i, encoder2, motor2);
-  //   }
-  // }
+void move(float cm){
+  encoder1.reset();
+  encoder2.reset();
+  PID pid1(30, 0, 0, 1000);
+  while(goStraight2(pid1, cm_to_clicks(cm), 40, encoder1, encoder2, motor1, motor2)){}
+  //OLED("Total error:", pid1.totalSquaredError);
+  stop_robot();
+}
 
-  // goSpeed(pid1, 20, encoder1, motor1);
-  // goSpeed(pid2, 20, encoder2, motor2);
+void reverse(float cm){
+  encoder1.reset();
+  encoder2.reset();
+  PID pid1(30, 0, 0, 1000);
+  while(goBack(pid1, cm_to_clicks(cm), 40, encoder1, encoder2, motor1, motor2)){}
+  //OLED("Total error:", pid1.totalSquaredError);
+  stop_robot();
+}
+
+void rotate(float angle, bool dir){
+  int clicks = round(angle/90*1180); //1210 is a constant - clicks for 90 degree rotation
+  PID pid1(30, 0, 0, 1000);
+  encoder1.reset();
+  encoder2.reset();
+  while(spin(pid1, clicks, 40, !dir, encoder1, encoder2, motor1, motor2)){}
+  //OLED("Total error:", pid1.totalSquaredError);
+  stop_robot();
+}
+
+void stop_robot(){
+  PID pid2(30, 0, 50, 1000);
+  PID pid3(30, 0, 50, 1000);
+  int final_pos = encoder1.getPos();
+  int final_pos2 = encoder2.getPos();
+  int start = millis();
+  while(millis() - start < 1500){
+     stop(pid2, final_pos, encoder1, motor1);
+     stop(pid3, final_pos2, encoder2, motor2);
+  }
+  motor1.powerMotor(0);
+  motor2.powerMotor(0);
+}

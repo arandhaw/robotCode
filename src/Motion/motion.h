@@ -6,11 +6,21 @@
 #include <OLED.h>
 #include <Motor.h>
 
-void goSpeed(PID &pid, int speed, Encoder enc, Motor m1);
-bool goStraight(int speed, Encoder enc1, Encoder enc2, Motor m1, Motor m2);
+extern Encoder encoder1;
+extern Encoder encoder2;
+extern Motor motor1;
+extern Motor motor2;
+
 bool goStraight2(PID &pid, int dist, int speed, Encoder enc1, Encoder enc2, Motor m1, Motor m2);
+bool goBack(PID &pid, int dist, int speed, Encoder enc1, Encoder enc2, Motor m1, Motor m2);
 void stop(PID &pid, int final_pos, Encoder enc, Motor motor);
 bool spin(PID &pid, int dist, int speed, bool dir, Encoder enc1, Encoder enc2, Motor m1, Motor m2);
 int cm_to_clicks(float cm);
+int clicks_to_cm(float cm);
+
+void rotate(float angle, bool dir);
+void move(float cm);
+void stop_robot();
+void reverse(float cm);
 
 #endif

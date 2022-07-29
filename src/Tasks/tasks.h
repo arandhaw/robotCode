@@ -6,14 +6,8 @@
 #include <OLED.h>
 #include <Motion/motion.h>
 
-extern Encoder encoder1;
-extern Encoder encoder2;
-extern Motor motor1;
-extern Motor motor2;
 
-void rotate(float angle, bool dir);
-void move(float cm);
-void stop_robot();
+
 void pickUpRight();
 
 #endif
