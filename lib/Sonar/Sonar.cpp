@@ -19,3 +19,8 @@ int Sonar::getDistance(){
   lastUse = millis();
   return ((duration/2) / 29.1);
 }
+
+int Sonar::getAdjustment(int distance) {
+  float L = 3;
+  return sin(15*PI/180)*distance + L;
+}

@@ -17,6 +17,7 @@ class Sonar {
     int lastUse;
     Sonar(int trigPin, int echoPin);
     int getDistance();
+    int getAdjustment(int distance);
     
 };
 

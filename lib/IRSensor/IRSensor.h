@@ -1,22 +1,18 @@
-#ifndef IR_Sensor_H // name of file, all caps (this is called a guard - it must be 
+#ifndef IR_SENSOR_H // name of file, all caps (this is called a guard - it must be 
                 // different for each header file, actual name is irrelevant)
-#define IR_sensor__H 
+#define IR_SENSOR_H 
 
-#include <wire.h>
-#define THRESHOLD 250 //Changed to 200
+#include <Arduino.h>
 
 // a class for analog Reflectance Sensors.
 
 class IRSensor {
   private:
     int pin;
-
+    int resetpin;
   public:
-    IRSensor(int pin);
-
-    int getRawValue();
-    //returns a digital value (1, 0) based on the threshold
-    bool getDigitalValue();
+    IRSensor(int pin, int resetpin);
+    int getValue();
 };
 
 #endif

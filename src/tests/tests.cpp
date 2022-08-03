@@ -35,3 +35,10 @@ void test_motors(){
     motor2.powerMotor(40);
     delay(1000);
 }
+
+void test_IR(){
+    int num1 = ir1.getValue();
+    delay(1);
+    int num2 = ir2.getValue();
+    OLED2("IR1, IR2:", num1, num2);
+}

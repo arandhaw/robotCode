@@ -11,7 +11,10 @@ void pickUpRight() {
   delay(1000);
   pwm_start(PB_7, 100, 15, TimerCompareFormat_t::PERCENT_COMPARE_FORMAT); //close claw
   delay(1000);
-  pwm_start(PB_6, 100, 16, TimerCompareFormat_t::PERCENT_COMPARE_FORMAT); //raise arm
+  pwm_start(PB_6, 100, 17, TimerCompareFormat_t::PERCENT_COMPARE_FORMAT); //raise arm
   delay(1000);
   pwm_start(PB_7, 100, 22, TimerCompareFormat_t::PERCENT_COMPARE_FORMAT); //open claw
+  delay(500);
+  pwm_start(PB_6, 100, 16, TimerCompareFormat_t::PERCENT_COMPARE_FORMAT); //raise arm
+
 }

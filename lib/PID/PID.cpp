@@ -12,7 +12,7 @@ void PID::reset(){
     error = 0; //variables to contain error values
     sumError = 0;
     lastError = 0; 
-    lastTime = 0;
+    lastTime = -100;
     time = 0;
     totalSquaredError = 0;
 
@@ -33,7 +33,10 @@ float PID::iValue(){
 }
 
 float PID::dValue(){
-    return (error - lastError)*KD;
+    if(lastTime == time){
+
+    }
+    return (error - lastError)/(lastTime - time)*KD;
 }
 
 float PID::pValue(){
