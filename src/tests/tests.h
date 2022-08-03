@@ -9,6 +9,7 @@
 #include <Motor.h>
 #include <Sonar.h>
 #include <DataBuffer.hpp>
+#include <IRSensor.h>
 
 #include "Tasks/tasks.h"
 #include "Motion/motion.h"
@@ -23,6 +24,8 @@ extern Sonar sonar_r;
 extern ReflectSensor R1; //left
 extern ReflectSensor R2; //middle
 extern ReflectSensor R3; //right
+extern IRSensor ir1;
+extern IRSensor ir2;
 
 
 void test_servos();
@@ -32,5 +35,5 @@ void test_counters();
 void test_encoders();
 void test_tapefollowing();
 void test_motors();
-
+void test_IR();
 #endif

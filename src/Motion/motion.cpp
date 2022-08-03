@@ -1,70 +1,100 @@
 #include "motion.h"
 
 
-bool goStraight2(PID &pid, int dist, int speed, Encoder enc1, Encoder enc2, Motor m1, Motor m2){
-    if(dist - enc1.getPos() < 1000){
-        speed = round( (dist - enc1.getPos())/1000*30 + (speed - 30)  );
-    }
+bool goStraight(PID &pid, int dist, int speed){
+    // if(dist - enc1.getPos() < 1000){
+    //     speed = round( (dist - enc1.getPos())/1000*30 + (speed - 30)  );
+    // }
     pid.lastError = pid.error;
-    pid.error = enc2.getSpeed() - enc1.getSpeed();
+    pid.error = encoder2.getSpeed() - encoder1.getSpeed();
     pid.sumError += pid.error;
     pid.totalSquaredError += pid.error*pid.error;
 
-    m1.powerMotor(speed + pid.PIDValue(), true);
-    m2.powerMotor(speed - pid.PIDValue(), true);
-    OLED_manual3(enc1.getSpeed(), pid.error, pid.totalSquaredError);
-    if(enc1.getPos() <= dist)
+    motor1.powerMotor(speed + round( pid.PIDValue() ) + 10, true);
+    motor2.powerMotor(speed - round( pid.PIDValue() ), true);
+    OLED_manual3(encoder1.getSpeed(), pid.error, pid.totalSquaredError);
+    if(encoder1.getPos() <= dist)
         return true;
     else {
-        m1.powerMotor(0);
-        m2.powerMotor(0);
+        motor1.powerMotor(0);
+        motor2.powerMotor(0);
         return false;
     }
 }
 
 //dir gives direction - spin right is ?? spin left is ??
-bool spin(PID &pid, int dist, int speed, bool dir, Encoder enc1, Encoder enc2, Motor m1, Motor m2){
-    // if(dist - abs( enc1.getPos()) < 1000){
-    //      speed = round((  abs(dist) - abs( enc1.getPos()) )/1000*30 + (speed - 30)  );
-    // }
+bool spin(PID &pid, int dist, int speed, bool dir){
 
     pid.lastError = pid.error;
-    pid.error = abs(enc2.getSpeed()) - abs(enc1.getSpeed());
+    pid.error = abs(encoder2.getSpeed()) - abs(encoder1.getSpeed());
     
 
     pid.sumError += pid.error;
     pid.totalSquaredError += pid.error*pid.error;
 
-    m1.powerMotor(speed + pid.PIDValue(), dir);
-    m2.powerMotor(speed - pid.PIDValue(), !dir);
-    OLED_manual3(enc1.getSpeed(), pid.error, 0);
+    motor1.powerMotor(speed + round(pid.PIDValue()), !dir);
+    motor2.powerMotor(speed - round(pid.PIDValue()), dir);
+    OLED_manual3(encoder1.getSpeed(), pid.error, 0);
     
-    if(abs( enc1.getPos() ) <= dist)
+    if(abs( encoder1.getPos() ) <= dist)
         return true;
     else {
         return false;
     }
 }
 
-bool goBack(PID &pid, int dist, int speed, Encoder enc1, Encoder enc2, Motor m1, Motor m2){
-    if(dist - abs(enc1.getPos()) < 1000){
-        speed = round( (dist - abs( enc1.getPos() ) )/1000*30 + (speed - 30)  );
+bool spinWide(int dist, int speed, bool dir){
+    
+    if(dir == false){
+      motor1.powerMotor(speed, true);
+      OLED_manual3(encoder1.getSpeed(), 0, 0);
+      if(abs( encoder1.getPos() ) <= dist){
+        return true;
+      } else { return false; }
+
+    } else {
+      motor2.powerMotor(speed, true);
+      OLED_manual3(encoder2.getSpeed(), 0, 0);
+      if(abs( encoder2.getPos() ) <= dist){
+        return true;
+      } else { return false; }
+
     }
+}
+
+bool goBackwards(PID &pid, int dist, int speed){
+    // if(dist - abs(enc1.getPos()) < 1000){
+    //     speed = round( (dist - abs( enc1.getPos() ) )/1000*30 + (speed - 30)  );
+    // }
     pid.lastError = pid.error;
-    pid.error = enc1.getSpeed() - enc2.getSpeed();
+    pid.error = encoder1.getSpeed() - encoder2.getSpeed();
     pid.sumError += pid.error;
     pid.totalSquaredError += pid.error*pid.error;
 
-    m1.powerMotor(speed + pid.PIDValue(), false);
-    m2.powerMotor(speed - pid.PIDValue(), false);
-    OLED_manual3(enc1.getSpeed(), pid.error, pid.totalSquaredError);
-    if(abs( enc1.getPos() )<= dist)
+    motor1.powerMotor(speed + round( pid.PIDValue() ), false);
+    motor2.powerMotor(speed - round( pid.PIDValue() ), false);
+    OLED_manual3(encoder1.getSpeed(), pid.error, pid.totalSquaredError);
+    if(abs( encoder1.getPos() )<= dist)
         return true;
     else {
-        m1.powerMotor(0);
-        m2.powerMotor(0);
+        motor1.powerMotor(0);
+        motor2.powerMotor(0);
         return false;
     }
+}
+
+void brake(bool dir){
+  motor1.powerMotor(100, !dir);
+  motor2.powerMotor(100, !dir);
+  delay(60);
+  motor1.powerMotor(0);
+  motor2.powerMotor(0);
+}
+
+void brake1(int duration, Motor mot, bool dir){
+  mot.powerMotor(100, !dir);
+  delay(duration);
+  mot.powerMotor(0);
 }
 
 void stop(PID &pid, int final_pos, Encoder enc, Motor motor){
@@ -93,16 +123,16 @@ void move(float cm){
   encoder1.reset();
   encoder2.reset();
   PID pid1(30, 0, 0, 1000);
-  while(goStraight2(pid1, cm_to_clicks(cm), 40, encoder1, encoder2, motor1, motor2)){}
+  while(goStraight(pid1, cm_to_clicks(cm), 40)){}
   //OLED("Total error:", pid1.totalSquaredError);
-  stop_robot();
+  brake(true);
 }
 
 void reverse(float cm){
   encoder1.reset();
   encoder2.reset();
   PID pid1(30, 0, 0, 1000);
-  while(goBack(pid1, cm_to_clicks(cm), 40, encoder1, encoder2, motor1, motor2)){}
+  while(goBackwards(pid1, cm_to_clicks(cm), 40)){}
   //OLED("Total error:", pid1.totalSquaredError);
   stop_robot();
 }
@@ -112,7 +142,7 @@ void rotate(float angle, bool dir){
   PID pid1(30, 0, 0, 1000);
   encoder1.reset();
   encoder2.reset();
-  while(spin(pid1, clicks, 40, !dir, encoder1, encoder2, motor1, motor2)){}
+  while(spin(pid1, clicks, 40, !dir)){}
   //OLED("Total error:", pid1.totalSquaredError);
   stop_robot();
 }
@@ -129,4 +159,13 @@ void stop_robot(){
   }
   motor1.powerMotor(0);
   motor2.powerMotor(0);
+}
+
+void rotate90(bool dir){
+  encoder1.reset();
+  encoder2.reset();
+  PID pidx(50, 0, 0, 1000);
+  while(spin(pidx, 1100, 20, dir)){}
+  brake1(60, motor1, !dir);
+  brake1(60, motor2, dir);
 }

@@ -7,12 +7,14 @@
 #include <PID.h>
 #include <DataBuffer.hpp>
 #include <Sonar.h>
+#include <IRSensor.h>
 //program files
 // #include "sweep.h"
 #include "Tasks/tasks.h"
 #include "Motion/motion.h"
 #include "tapeFollow/tapeFollow.h"
 #include "tests/tests.h"
+#include "IRFollow/IRFollow.h"
 
 // #include "runMotors.h" 
 // #include "testMotors.h" 
@@ -27,65 +29,30 @@ Motor motor2(PA2, PA_2, PA3, PA_3); //left motor
 Encoder encoder2(PB15, PB14, 2);
 Encoder encoder1(PB12, PB13, 1);
 Sonar sonar_r(PB3, PA15);
+IRSensor ir1(PB0, PA8);
+IRSensor ir2(PB1, PA8);
 DataBuffer<int> sonar_data(5, 100);
 PID pid_tape_45(10, 0, 5, 0);
-
-void selfOptimize(){
-  float arr[2][6];
-  int j = 0; 
-  for(int i = 5; i <= 30; i = i + 5){
-    PID pid(i, 0, 0, 1000);
-    encoder1.reset();
-    encoder2.reset();
-    motor1.powerMotor(50);
-    motor2.powerMotor(50);
-    while(goStraight2(pid, 20000, 50, encoder1, encoder2, motor1, motor2)){}
-    OLED("total error", pid.totalSquaredError);
-    arr[0][j] = i;
-    arr[1][j] = pid.totalSquaredError;
-    delay(4000);
-    j++;
-  }
-
-  int min = 0; 
-  for(int k = 1; k < 6; k++){
-    if(arr[1][k] > arr[1][min]){
-      min = k;
-    }
-  }
-  OLED2("Smallest Error:", arr[0][min], arr[1][min]);
-}
-
-
+PID pid_ir(20, 0, 0, 0);
 
 void setup(){
   setup_OLED(); 
-  // move(30);
-  // rotate(45, false);
-  // move(30);
-  // rotate(45, true);
+  // PID pidx(50, 0, 0, 1000);
+  // while(spin(pidx, 1100, 20, false)){}
+  // brake1(60, motor1, false);
+  // brake1(60, motor2, true);
   // while(true);
-  // encoder1.reset();
-  // encoder2.reset();
-  // PID pid1(30, 0, 0, 1000);
-  // while(goBack(pid1, cm_to_clicks(300), 40, encoder1, encoder2, motor1, motor2)){}
-  // while(true){}
-  //OLED("Total error:", pid1.totalSquaredError);
-  //2 seconds of delay within this function
-  //rotate(false); //true turns right, false turns left
-  //delay(500);
-  //encoder1.reset();
-  //encoder2.reset();
-  //selfOptimize();
-  // move(50);
-  // rotate(180, true);
-  // move(50);
-  //pwm_start(PB_6, 100, 12, TimerCompareFormat_t::PERCENT_COMPARE_FORMAT);
+  // while(spin(pidx, 1160, 40, true)){}
+  // brake1(75, motor1, true);
+  // brake1(75, motor2, false);
+  // while(true){
+  // }
   
 }
 
-int idol_num = 4; //global variable to keep track of state
+int idol_num = 2; //global variable to keep track of state
 int var = 0; 
+int state = 0;
 PID pid2(30, 0, 0, 1000);
 
 void loop(){
@@ -121,27 +88,46 @@ void loop(){
         }
       }
   } else if (idol_num == 2){
-      move(100);
-      rotate(90, false);
-      move(13);
-      rotate(90, false);
-      while(goStraight2(pid2, cm_to_clicks(50), 40, encoder1, encoder2, motor1, motor2)){
+      IRFollow(pid_ir, 40);
+      if(encoder1.getPos() > cm_to_clicks(100)){
+        if(millis() - sonar_r.lastUse > 60){
+          int dist = sonar_r.getDistance();
+          if(dist < 22 && dist > 8){
+            move(7);
+            pickUpRight();
+            idol_num = 3;
+        }
+      }
+    }  
+  } else if (idol_num == 3){
+      if(var == 0){
+        rotate90(false);
+        delay(1000);
+        move(10);
+        delay(1000);
+        encoder1.reset();
+        encoder2.reset();
+        while(spinWide(2200, 40, false)){}
+        brake1(80, motor1, true);
+        delay(1000);
+        encoder1.reset();
+        encoder2.reset();
+        var++;
+      }
+      goStraight(pid2, cm_to_clicks(200), 40);
+      if(encoder1.getPos() > cm_to_clicks(30)){
         if(millis() - sonar_r.lastUse > 60){
           int dist = sonar_r.getDistance();
           if(dist < 25 && dist > 8){
             move(5);
             pickUpRight();
+            idol_num = 69;
           }
         }
       }
-      rotate(90, false);
-      move(10);
-      rotate(90, false);
-      move(50);
-      idol_num = 69;
   } else if (idol_num == 4){
     if(encoder1.getPos() < cm_to_clicks(80) && var == 0){
-      goStraight2(pid2, cm_to_clicks(300), 40, encoder1, encoder2, motor1, motor2);
+      goStraight(pid2, cm_to_clicks(300), 40);
     } else {
       if(var == 0){
         stop_robot();
@@ -150,7 +136,7 @@ void loop(){
         rotate(45, true);
         var = 1;
       }
-      goStraight2(pid2, cm_to_clicks(200), 40, encoder1, encoder2, motor1, motor2);
+      goStraight(pid2, cm_to_clicks(200), 40);
       if(millis() - sonar_r.lastUse > 60){
         int dist = sonar_r.getDistance();
         if(dist < 25 && dist > 8){

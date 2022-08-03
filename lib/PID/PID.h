@@ -10,8 +10,8 @@ class PID{
         float error; //variables to contain error values
         float sumError;
         float lastError; 
-        int lastTime;
-        int time;
+        float lastTime;
+        float time;
         float totalSquaredError;
 
         float var1, var2, var3, var4; //4 extra variables to use as you see fit
