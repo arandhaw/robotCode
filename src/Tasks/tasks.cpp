@@ -2,6 +2,7 @@
 
 void sonarPID(PID &pid){
   pid.lastError = pid.error;
+  pid.lastTime = pid.time;
   int reading1 = sonar_r.getDistance();
   int reading2 = sonar_l.getDistance();
   pid.error = ((float) reading2 - reading1);
@@ -23,7 +24,7 @@ void sonarPID(PID &pid){
 
 void findIdol(){
   int time = millis();
-  PID pid1(2, 0, 2, 100);
+  PID pid1(8, 0, 0, 100);
   while(millis() - time < 5000){
     sonarPID(pid1);
   }
