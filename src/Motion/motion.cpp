@@ -2,9 +2,7 @@
 
 
 bool goStraight(PID &pid, int dist, int speed){
-    // if(dist - enc1.getPos() < 1000){
-    //     speed = round( (dist - enc1.getPos())/1000*30 + (speed - 30)  );
-    // }
+
     pid.lastError = pid.error;
     pid.error = encoder2.getSpeed() - encoder1.getSpeed();
     pid.sumError += pid.error;
@@ -63,9 +61,7 @@ bool spinWide(int dist, int speed, bool dir){
 }
 
 bool goBackwards(PID &pid, int dist, int speed){
-    // if(dist - abs(enc1.getPos()) < 1000){
-    //     speed = round( (dist - abs( enc1.getPos() ) )/1000*30 + (speed - 30)  );
-    // }
+    
     pid.lastError = pid.error;
     pid.error = encoder1.getSpeed() - encoder2.getSpeed();
     pid.sumError += pid.error;
@@ -95,6 +91,14 @@ void brake1(int duration, Motor mot, bool dir){
   mot.powerMotor(100, !dir);
   delay(duration);
   mot.powerMotor(0);
+}
+
+void brakeSpin(bool dir){
+  motor1.powerMotor(100, !dir);
+  motor2.powerMotor(100, dir);
+  delay(60);
+  motor1.powerMotor(0);
+  motor2.powerMotor(0);
 }
 
 void stop(PID &pid, int final_pos, Encoder enc, Motor motor){
@@ -134,19 +138,8 @@ void reverse(float cm){
   PID pid1(30, 0, 0, 1000);
   while(goBackwards(pid1, cm_to_clicks(cm), 40)){}
   //OLED("Total error:", pid1.totalSquaredError);
-  stop_robot();
+  brake(false);
 }
-
-void rotate(float angle, bool dir){
-  int clicks = round(angle/90*1180); //1210 is a constant - clicks for 90 degree rotation
-  PID pid1(30, 0, 0, 1000);
-  encoder1.reset();
-  encoder2.reset();
-  while(spin(pid1, clicks, 40, !dir)){}
-  //OLED("Total error:", pid1.totalSquaredError);
-  stop_robot();
-}
-
 void stop_robot(){
   PID pid2(30, 0, 50, 1000);
   PID pid3(30, 0, 50, 1000);
@@ -161,6 +154,17 @@ void stop_robot(){
   motor2.powerMotor(0);
 }
 
+void rotate(float angle, bool dir){
+  int clicks = round(angle/90*1180); //1210 is a constant - clicks for 90 degree rotation
+  PID pid1(30, 0, 0, 1000);
+  encoder1.reset();
+  encoder2.reset();
+  while(spin(pid1, clicks, 40, dir)){}
+  //OLED("Total error:", pid1.totalSquaredError);
+  brake1(60, motor1, !dir);
+  brake1(60, motor2, dir);
+}
+
 void rotate90(bool dir){
   encoder1.reset();
   encoder2.reset();
@@ -168,4 +172,17 @@ void rotate90(bool dir){
   while(spin(pidx, 1100, 20, dir)){}
   brake1(60, motor1, !dir);
   brake1(60, motor2, dir);
+}
+
+void rotateWide(int angle, bool dir){
+  int clicks = round( (float) angle/2400*90 );
+  encoder1.reset();
+  encoder2.reset();
+  if (dir == false){
+    while(spinWide(clicks, 40, false)){}
+    brake1(80, motor1, true);
+  } else {
+    while(spinWide(clicks, 40, true)){}
+    brake1(80, motor2, true);
+  }
 }

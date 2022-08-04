@@ -36,4 +36,5 @@ void test_encoders();
 void test_tapefollowing();
 void test_motors();
 void test_IR();
+void test_sonars();
 #endif

@@ -1,7 +1,40 @@
 #include "tasks.h"
 
+void sonarPID(PID &pid){
+  if(millis() - sonar_r.lastUse < 60){
+    return;
+  }
+  pid.lastError = pid.error;
+  pid.lastTime = pid.time;
+  int reading1 = sonar_r.getDistance();
+  delay(15);
+  int reading2 = sonar_l.getDistance();
+  pid.error = ((float) reading2 - reading1);
+  pid.time = (float) micros()/1000; 
+  pid.sumError += pid.error;
+  pid.totalSquaredError += pid.error*pid.error;
 
+  int power = round( pid.PIDValue() );
+  //capping the max motor speed
+  if(power > 20){
+    power = 20;
+  } else if (power < -20){
+    power = -20;
+  }
+  motor1.powerMotor(power);
+  motor2.powerMotor(power);
+  OLED_manual2(reading2 - reading1, reading1, reading2);
+}
 
+void findIdol(){
+  int time = millis();
+  PID pid1(8, 0, 0, 100);
+  while(millis() - time < 5000){
+    sonarPID(pid1);
+  }
+  motor1.powerMotor(0);
+  motor2.powerMotor(0);
+}
 
 void pickUpRight() {
   //PA8 is arm 9 is claw
