@@ -7,6 +7,8 @@
 #include <Motion/motion.h>
 #include <Sonar.h>
 #include <PID.h>
+#include "SoftwareSerial.h"
+
 
 extern Sonar sonar_r;
 extern Sonar sonar_l;

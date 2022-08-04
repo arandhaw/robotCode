@@ -15,6 +15,9 @@
 #include "tapeFollow/tapeFollow.h"
 #include "tests/tests.h"
 #include "IRFollow/IRFollow.h"
+#include <SoftwareSerial.h>
+
+SoftwareSerial myserial(PB11, PB10); //PB11 PB10 works best
 
 // #include "runMotors.h" 
 // #include "testMotors.h" 
@@ -35,14 +38,21 @@ IRSensor ir2(PB1, PA8);
 DataBuffer<int> sonar_data(5, 100);
 PID pid_tape_45(10, 0, 5, 0);
 PID pid_ir(20, 0, 0, 0);
-PID pidsonar(5, 0, 0, 0);
+PID pidsonar(10, 0, 0, 0);
 
 void setup(){
   setup_OLED(); 
-  while(true){
-    //test_sonars();
-    sonarPID(pidsonar);
-  }  // PID pidx(50, 0, 0, 1000);
+
+  //myserial.begin(9600);
+  // int average = 1;
+  // while(true){
+  //   sonarPID(pidsonar);
+  //   //test_sonars();
+  // }
+
+    
+    
+    // PID pidx(50, 0, 0, 1000);
   // while(spin(pidx, 1100, 20, false)){}
   // brake1(60, motor1, false);
   // brake1(60, motor2, true);
@@ -62,17 +72,20 @@ PID pid2(30, 0, 0, 1000);
 
 void loop(){
   if(idol_num == 0){
-    if( encoder1.getPos() < cm_to_clicks(180)){
+    if( encoder1.getPos() < cm_to_clicks(160)){
       tapeFollow(pid_tape_45, 45, R1, R2, R3, motor1, motor2);
     } else {
       tapeFollow(pid_tape_45, 45, R1, R2, R3, motor1, motor2);
       if(millis() - sonar_r.lastUse > 60){
         sonar_data.add(sonar_r.getDistance());
         int dist = sonar_data.get(0);
-        if(dist < 20 && dist > 8){
+
+        if(dist < 25 && dist > 8){
           brake(true);
-          findIdol();
-          pickUpRight();
+          //findIdol();
+          //pickUpRight();
+          
+          ///pickUpRight();
           idol_num = 69;
         }
       }
