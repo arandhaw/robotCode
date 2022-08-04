@@ -46,6 +46,7 @@ void test_IR(){
 void test_sonars(){
     if(sonar_r.lastUse - millis() > 60){
         int reading1 = sonar_r.getDistance();
+        delay(30);
         int reading2 = sonar_l.getDistance();
         int error = reading2 - reading1;
         OLED_manual2(error, reading1, reading2);

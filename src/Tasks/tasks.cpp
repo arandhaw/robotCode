@@ -1,9 +1,13 @@
 #include "tasks.h"
 
 void sonarPID(PID &pid){
+  if(millis() - sonar_r.lastUse < 60){
+    return;
+  }
   pid.lastError = pid.error;
   pid.lastTime = pid.time;
   int reading1 = sonar_r.getDistance();
+  delay(15);
   int reading2 = sonar_l.getDistance();
   pid.error = ((float) reading2 - reading1);
   pid.time = (float) micros()/1000; 

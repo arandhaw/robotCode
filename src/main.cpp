@@ -35,13 +35,14 @@ IRSensor ir2(PB1, PA8);
 DataBuffer<int> sonar_data(5, 100);
 PID pid_tape_45(10, 0, 5, 0);
 PID pid_ir(20, 0, 0, 0);
-PID pidsonar(10, 0, 0, 0);
+PID pidsonar(5, 0, 0, 0);
 
 void setup(){
   setup_OLED(); 
-  // while(true){
-  //   sonarPID(pidsonar);
-  // }  // PID pidx(50, 0, 0, 1000);
+  while(true){
+    //test_sonars();
+    sonarPID(pidsonar);
+  }  // PID pidx(50, 0, 0, 1000);
   // while(spin(pidx, 1100, 20, false)){}
   // brake1(60, motor1, false);
   // brake1(60, motor2, true);
