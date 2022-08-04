@@ -29,15 +29,19 @@ Motor motor2(PA2, PA_2, PA3, PA_3); //left motor
 Encoder encoder2(PB15, PB14, 2);
 Encoder encoder1(PB12, PB13, 1);
 Sonar sonar_r(PB3, PA15);
+Sonar sonar_l(PB5, PB4); //rename pins!!
 IRSensor ir1(PB0, PA8);
 IRSensor ir2(PB1, PA8);
 DataBuffer<int> sonar_data(5, 100);
 PID pid_tape_45(10, 0, 5, 0);
 PID pid_ir(20, 0, 0, 0);
+PID pidsonar(10, 0, 0, 0);
 
 void setup(){
   setup_OLED(); 
-  // PID pidx(50, 0, 0, 1000);
+  // while(true){
+  //   sonarPID(pidsonar);
+  // }  // PID pidx(50, 0, 0, 1000);
   // while(spin(pidx, 1100, 20, false)){}
   // brake1(60, motor1, false);
   // brake1(60, motor2, true);
@@ -50,7 +54,7 @@ void setup(){
   
 }
 
-int idol_num = 2; //global variable to keep track of state
+int idol_num = 0; //global variable to keep track of state
 int var = 0; 
 int state = 0;
 PID pid2(30, 0, 0, 1000);
@@ -65,10 +69,10 @@ void loop(){
         sonar_data.add(sonar_r.getDistance());
         int dist = sonar_data.get(0);
         if(dist < 20 && dist > 8){
-          move(5);
+          brake(true);
+          findIdol();
           pickUpRight();
-          idol_num = 1;
-          reverse(8);
+          idol_num = 69;
         }
       }
     }
@@ -122,29 +126,24 @@ void loop(){
             move(5);
             pickUpRight();
             idol_num = 69;
+            var = 0;
           }
         }
       }
   } else if (idol_num == 4){
-    if(encoder1.getPos() < cm_to_clicks(80) && var == 0){
-      goStraight(pid2, cm_to_clicks(300), 40);
-    } else {
-      if(var == 0){
-        stop_robot();
-        rotate(45, false);
-        move(14);
-        rotate(45, true);
-        var = 1;
-      }
-      goStraight(pid2, cm_to_clicks(200), 40);
-      if(millis() - sonar_r.lastUse > 60){
-        int dist = sonar_r.getDistance();
-        if(dist < 25 && dist > 8){
-          move(5);
-          pickUpRight();
-          idol_num = 69;
-          }
-        }
+    if(var == 0){
+      rotateWide(90, false);
+      rotate90(false);
+      pid_ir.reset();
+      var = 1;
+      encoder1.reset();
+      encoder2.reset();
+    }
+    IRFollow(pid_ir, 40);
+    if(encoder1.getPos() > cm_to_clicks(100)){
+      brake(true);
+      idol_num = 69;
+      var = 0;
     }
   } else if (idol_num == 69){
     motor1.powerMotor(0);

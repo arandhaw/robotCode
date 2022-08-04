@@ -5,9 +5,16 @@
 #include <Motor.h>
 #include <OLED.h>
 #include <Motion/motion.h>
+#include <Sonar.h>
+#include <PID.h>
 
+extern Sonar sonar_r;
+extern Sonar sonar_l;
+extern Motor motor1;
+extern Motor motor2;
 
-
+void sonarPID(PID &pid);
+void findIdol();
 void pickUpRight();
 
 #endif

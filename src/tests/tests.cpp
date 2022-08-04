@@ -42,3 +42,12 @@ void test_IR(){
     int num2 = ir2.getValue();
     OLED2("IR1, IR2:", num1, num2);
 }
+
+void test_sonars(){
+    if(sonar_r.lastUse - millis() > 60){
+        int reading1 = sonar_r.getDistance();
+        int reading2 = sonar_l.getDistance();
+        int error = reading2 - reading1;
+        OLED_manual2(error, reading1, reading2);
+    }
+}
