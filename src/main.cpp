@@ -45,10 +45,10 @@ void setup(){
 
   //myserial.begin(9600);
   // int average = 1;
-  // while(true){
-  //   sonarPID(pidsonar);
-  //   //test_sonars();
-  // }
+  while(true){
+    //sonarPID(pidsonar);
+    test_sonars();
+  }
 
     
     
@@ -72,7 +72,7 @@ PID pid2(30, 0, 0, 1000);
 
 void loop(){
   if(idol_num == 0){
-    if( encoder1.getPos() < cm_to_clicks(160)){
+    if( encoder1.getPos() < cm_to_clicks(180)){
       tapeFollow(pid_tape_45, 45, R1, R2, R3, motor1, motor2);
     } else {
       tapeFollow(pid_tape_45, 45, R1, R2, R3, motor1, motor2);
