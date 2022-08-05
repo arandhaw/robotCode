@@ -145,12 +145,13 @@ void loop(){
           reverse(4);
           motor1.powerMotor(15);
           
-          while(true){
+          int start = millis();
+          while(start - millis() < 3000){
             if(ir1.getValue() > 200 && ir2.getValue() > 200){
-            brake1(40, motor1, true);
             break;
             }
           }
+          brake1(40, motor1, true);
           idol_num = 2;
           var = 0;
           encoder1.reset();
