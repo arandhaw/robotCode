@@ -28,7 +28,9 @@ int clicks_to_cm(float cm);
 
 //functions that are called once
 void move(float cm);
+void moveB(float cm);
 void reverse(float cm);
+void reverseB(float cm);
 void rotate(float angle, bool dir);
 void rotate90(bool dir);
 void rotateWide(int angle, bool dir);

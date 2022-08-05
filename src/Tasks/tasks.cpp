@@ -37,17 +37,37 @@ void findIdol(){
 }
 
 void pickUpRight() {
-  //PA8 is arm 9 is claw
-  pwm_start(PB_7, 100, 22, TimerCompareFormat_t::PERCENT_COMPARE_FORMAT); //open claw
+  
+  // arm.move(15);
+  // OLED("PWM before motion", arm.current_pwm);
+  // delay(5000);
+  // arm.moveSlowly(5, 100);
+  // OLED("PWM after motion", arm.current_pwm);
+  // delay(1000);
+  
+  arm.move(655);
+  claw.move(901); //open claw
   delay(1000);
-  pwm_start(PB_6, 100, 5, TimerCompareFormat_t::PERCENT_COMPARE_FORMAT);  //lower arm
+
+  // for(int pwm = 655; pwm >= 205; pwm--){
+  //   arm.move(pwm);
+  //   int start = millis();
+  //   while(millis() - start < 12){
+  //     if(1 == 2){
+  //       break;
+  //     }
+  //   }
+  // }
+
+  arm.move(205); //lower arm
   delay(1000);
-  pwm_start(PB_7, 100, 15, TimerCompareFormat_t::PERCENT_COMPARE_FORMAT); //close claw
+  claw.move(614); //close claw
   delay(1000);
-  pwm_start(PB_6, 100, 17, TimerCompareFormat_t::PERCENT_COMPARE_FORMAT); //raise arm
+  arm.move(680); //raise arm
   delay(1000);
-  pwm_start(PB_7, 100, 22, TimerCompareFormat_t::PERCENT_COMPARE_FORMAT); //open claw
+  claw.move(901); //open claw
   delay(500);
-  pwm_start(PB_6, 100, 16, TimerCompareFormat_t::PERCENT_COMPARE_FORMAT); //raise arm
+  arm.move(655);
 
 }
+

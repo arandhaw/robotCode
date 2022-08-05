@@ -3,9 +3,8 @@
 #define SONAR_H 
 
 #include <wire.h>
-#define THRESHOLD 250 //Changed to 200
 
-// a class for analog Reflectance Sensors.
+// a class for analog Reflectance Sensors
 
 class Sonar {
   private:

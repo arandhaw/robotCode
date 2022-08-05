@@ -94,8 +94,8 @@ void brake1(int duration, Motor mot, bool dir){
 }
 
 void brakeSpin(bool dir){
-  motor1.powerMotor(100, !dir);
-  motor2.powerMotor(100, dir);
+  motor1.powerMotor(100, dir);
+  motor2.powerMotor(100, !dir);
   delay(60);
   motor1.powerMotor(0);
   motor2.powerMotor(0);
@@ -132,6 +132,16 @@ void move(float cm){
   brake(true);
 }
 
+void moveB(float cm){
+  encoder1.reset();
+  encoder2.reset();
+  PID pid1(30, 0, 0, 1000);
+  while(goStraight(pid1, cm_to_clicks(cm), 40)){}
+  //OLED("Total error:", pid1.totalSquaredError);
+  motor1.powerMotor(0);
+  motor2.powerMotor(0);
+}
+
 void reverse(float cm){
   encoder1.reset();
   encoder2.reset();
@@ -140,6 +150,17 @@ void reverse(float cm){
   //OLED("Total error:", pid1.totalSquaredError);
   brake(false);
 }
+
+void reverseB(float cm){
+  encoder1.reset();
+  encoder2.reset();
+  PID pid1(30, 0, 0, 1000);
+  while(goBackwards(pid1, cm_to_clicks(cm), 40)){}
+  //OLED("Total error:", pid1.totalSquaredError);
+  motor1.powerMotor(0);
+  motor2.powerMotor(0);
+}
+
 void stop_robot(){
   PID pid2(30, 0, 50, 1000);
   PID pid3(30, 0, 50, 1000);
@@ -175,7 +196,7 @@ void rotate90(bool dir){
 }
 
 void rotateWide(int angle, bool dir){
-  int clicks = round( (float) angle/2400*90 );
+  int clicks = round( (float) angle*2400/90 );
   encoder1.reset();
   encoder2.reset();
   if (dir == false){
