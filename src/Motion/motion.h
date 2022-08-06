@@ -21,6 +21,8 @@ bool spinWide(int dist, int speed, bool dir);
 void brake(bool dir);
 void brake1(int duration, Motor mot, bool dir);
 void brakeSpin(bool dir);
+void manualBrake(int duration1, int duration2, int dir1, int dir2);
+//notes on braking: 
 
 //conversion functions
 int cm_to_clicks(float cm);

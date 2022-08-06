@@ -93,6 +93,24 @@ void brake1(int duration, Motor mot, bool dir){
   mot.powerMotor(0);
 }
 
+void manualBrake(int duration1, int duration2, int dir1, int dir2){
+  motor1.powerMotor(100, dir1);
+  motor2.powerMotor(100, dir2);
+  int start = millis();
+  bool stop1 = false;
+  bool stop2 = false;
+  while(stop1 == false || stop2 == false){
+    if(millis() - start > duration1 && stop1 == false){
+      motor1.powerMotor(0);
+      stop1 == true;
+    }
+    if(millis() - start > duration2 && stop2 == false){
+      motor2.powerMotor(0);
+      stop2 == true;
+    }
+  }
+}
+
 void brakeSpin(bool dir){
   motor1.powerMotor(100, dir);
   motor2.powerMotor(100, !dir);
@@ -182,8 +200,7 @@ void rotate(float angle, bool dir){
   encoder2.reset();
   while(spin(pid1, clicks, 40, dir)){}
   //OLED("Total error:", pid1.totalSquaredError);
-  brake1(60, motor1, !dir);
-  brake1(60, motor2, dir);
+  manualBrake(60, 60, !dir, dir);
 }
 
 void rotate90(bool dir){
@@ -191,8 +208,7 @@ void rotate90(bool dir){
   encoder2.reset();
   PID pidx(50, 0, 0, 1000);
   while(spin(pidx, 1100, 20, dir)){}
-  brake1(60, motor1, !dir);
-  brake1(60, motor2, dir);
+  manualBrake(60, 60, !dir, dir);
 }
 
 void rotateWide(int angle, bool dir){
