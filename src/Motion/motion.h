@@ -5,6 +5,7 @@
 #include <PID.h>
 #include <OLED.h>
 #include <Motor.h>
+#include <Arduino.h>
 
 extern Encoder encoder1;
 extern Encoder encoder2;
