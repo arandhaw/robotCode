@@ -1,6 +1,6 @@
 #include "PID.h"
 
-PID::PID(int KP, int KI, int KD, int i_max){
+PID::PID(int KP, int KI, int KD, int I_MAX){
     this->KP = KP;
     this->KI = KI;
     this->KD = KD;
@@ -33,9 +33,7 @@ float PID::iValue(){
 }
 
 float PID::dValue(){
-    if(lastTime == time){
 
-    }
     return (error - lastError)/(lastTime - time)*KD;
 }
 

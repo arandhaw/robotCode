@@ -2,7 +2,6 @@
 #include <DataBuffer.hpp>
 #include "SoftwareSerial.h"
 
-
 //DataBuffer<int> sonar_pid_data(3, 10);
 
 
@@ -54,6 +53,7 @@ void sonarPID(PID &pid){
 
 }
 
+
 void findIdol(){
   int time = millis();
   PID pid1(8, 0, 0, 100);
@@ -66,15 +66,61 @@ void findIdol(){
 
 void pickUpRight() {
   
-   pwm_start(PB_7, 100, 14, TimerCompareFormat_t::PERCENT_COMPARE_FORMAT); //open claw
+
+  // arm.move(15);
+  // OLED("PWM before motion", arm.current_pwm);
+  // delay(5000);
+  // arm.moveSlowly(5, 100);
+  // OLED("PWM after motion", arm.current_pwm);
+  // delay(1000);
+  
+  arm.move(620);
   delay(1000);
-  pwm_start(PB_6, 100, 5, TimerCompareFormat_t::PERCENT_COMPARE_FORMAT);  //lower arm
+  claw.move(150); //close claw
   delay(1000);
-  pwm_start(PB_7, 100, 4, TimerCompareFormat_t::PERCENT_COMPARE_FORMAT); //close claw
+  arm.move(500);
+  for(int pwm = 500; pwm >= 348; pwm--){
+    arm.move(pwm);
+    int start = millis();
+    while(millis() - start < 12){
+      if(hall.getValue() == LOW){
+        delay(1000);
+        resetClaw();
+        return;
+      }
+    }
+  }
+  delay(1000);
+  for(int pwm = 287; pwm <= 573; pwm++){ //slowly open claw
+    claw.move(pwm);
+    int start = millis();
+    while(millis() - start < 8){
+      if(hall.getValue() == LOW){
+        delay(1000);
+        resetClaw();
+        return;
+      }
+    }
+  }
+  delay(1000);
+  arm.move(205);
+  delay(1000);
+  claw.move(174); //close claw
   delay(1000);
   pwm_start(PB_6, 100, 16, TimerCompareFormat_t::PERCENT_COMPARE_FORMAT); //raise arm
   delay(1000);
-  pwm_start(PB_7, 100, 7, TimerCompareFormat_t::PERCENT_COMPARE_FORMAT);
-
+  claw.move(287); //open claw in box
+  delay(1000);
+  arm.move(620); //reset position of claw
+  delay(1000);
+  claw.move(573); //open claw fully
 }
+
+
+void resetClaw(){
+  claw.move(573); //open claw
+  delay(1000);
+  arm.move(620);
+}
+
 
