@@ -6,22 +6,23 @@ servo::servo(PinName pin){
 }
 
 void servo::move(int pwm){
-    pwm_start(pin, 100, pwm, TimerCompareFormat_t::PERCENT_COMPARE_FORMAT); 
+    pwm_start(pin, 100, pwm, TimerCompareFormat_t::RESOLUTION_12B_COMPARE_FORMAT); 
     current_pwm = pwm;
 }
 
-void servo::moveSlowly(int pwm, int speed){
-    if(current_pwm = -1){
+void servo::moveSlowly(int pwm, int millis){
+    int start_pos = current_pwm;
+    if(start_pos == -1){
         move(pwm);
-    } else if(pwm < current_pwm){
-        for(int i = pwm; i >= pwm; i--){
-            move(i);
-            delay(speed);
+    } else if(pwm < start_pos){
+        for(int j = start_pos; j >= pwm; j--){
+            move(j);
+            delay(millis);
         }
-    } else if(pwm > current_pwm){
-        for(int i = pwm; i <= pwm; i++){
-            move(i);
-            delay(speed);
+    } else if(pwm > start_pos){
+        for(int j = start_pos; j <= pwm; j++){
+            move(j);
+            delay(millis);
         }
     }
 }

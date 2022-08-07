@@ -8,6 +8,8 @@
 #include <DataBuffer.hpp>
 #include <Sonar.h>
 #include <IRSensor.h>
+#include <servo.h>
+#include <DigitalSensor.h>
 //program files
 // #include "sweep.h"
 #include "Tasks/tasks.h"
@@ -32,27 +34,30 @@ Motor motor2(PA2, PA_2, PA3, PA_3); //left motor
 Encoder encoder2(PB15, PB14, 2);
 Encoder encoder1(PB12, PB13, 1);
 Sonar sonar_r(PB3, PA15);
-Sonar sonar_l(PB5, PB4); //rename pins!!
+Sonar sonar_l(PB5, PB4); 
 IRSensor ir1(PB0, PA8);
 IRSensor ir2(PB1, PA8);
+servo arm(PB_6);
+servo claw(PB_7);
+//DigitalSensor hall(pin);
+DataBuffer<bool> sonar_bool(50, 0);
 DataBuffer<int> sonar_data(5, 100);
 PID pid_tape_45(10, 0, 5, 0);
 PID pid_ir(20, 0, 0, 0);
-PID pidsonar(10, 0, 0, 0);
+
+PID pidsonar(5, 0, 0, 0);
+PID pidmotion(40, 0, 0, 0);
 
 void setup(){
-  setup_OLED(); 
+  setup_OLED();
 
-  //myserial.begin(9600);
-  // int average = 1;
+  
   while(true){
-    //sonarPID(pidsonar);
-    test_sonars();
-  }
-
+    test_IR();
+  } 
     
-    
-    // PID pidx(50, 0, 0, 1000);
+    //test_pickup();
+  // PID pidx(50, 0, 0, 1000);
   // while(spin(pidx, 1100, 20, false)){}
   // brake1(60, motor1, false);
   // brake1(60, motor2, true);
@@ -76,32 +81,83 @@ void loop(){
       tapeFollow(pid_tape_45, 45, R1, R2, R3, motor1, motor2);
     } else {
       tapeFollow(pid_tape_45, 45, R1, R2, R3, motor1, motor2);
-      if(millis() - sonar_r.lastUse > 60){
-        sonar_data.add(sonar_r.getDistance());
-        int dist = sonar_data.get(0);
+      if(millis() - sonar_r.lastUse > 2){
+        //sonar_data.add(sonar_r.getDistance());
+        int dist = sonar_r.getDistance();
+        if(dist < 22 && dist > 8){ sonar_bool.add(true);
+        } else { sonar_bool.add(false); }
 
-        if(dist < 25 && dist > 8){
+        if(dist < 22 && dist > 8){
           brake(true);
-          //findIdol();
-          //pickUpRight();
-          
-          ///pickUpRight();
-          idol_num = 69;
+          //move(2);
+          // int sum = 0;
+          // int divisor = 0;
+          // for (int i = 0; i < 50; i++) {
+            
+          //   int leftReading = sonar_l.getDistance();
+          //   delay(1);
+          //   int rightReading = sonar_r.getDistance();
+          //   if (leftReading < 70 && rightReading < 70) {
+          //     int dif = rightReading - leftReading;
+          //     sum += dif;
+          //     divisor++;
+          //   }
+          //   delay(1);
+          // }
+        
+          // float avg = (float) sum/divisor;
+          // if (avg > 3 && avg < 20) {
+          //   moveB(1);
+          //   stop_robot();
+          // } 
+          // if (avg > 20 && avg < 70) {
+          //   moveB(2);
+          //   stop_robot();
+          // }
+          // if (avg < -3 && avg > -20) {
+          //   reverseB(1);
+          //   stop_robot();
+          // }
+          // if (avg < -20 && avg > -70) {
+          //   reverseB(2);
+          //   stop_robot();
+          // }
+          delay(1000);
+          pickUpRight();
+          idol_num = 1;
+          reverse(7);
         }
       }
     }
   } else if (idol_num == 1){
-    if( encoder1.getPos() < cm_to_clicks(60) ){
+    if( encoder1.getPos() < cm_to_clicks(80) ){
       tapeFollow(pid_tape_45, 45, R1, R2, R3, motor1, motor2);
     } else {
       tapeFollow(pid_tape_45, 45, R1, R2, R3, motor1, motor2);
-      if(millis() - sonar_r.lastUse > 60){
+      if(millis() - sonar_r.lastUse > 2){
+        
         int dist = sonar_r.getDistance();
-        if(dist < 25 && dist > 8){
-          move(5);
+        if(dist < 22){ sonar_bool.add(true);
+        } else { sonar_bool.add(false); }
+
+        if(dist < 22 && dist > 8){
+          brake(true);
           pickUpRight();
-          idol_num = 69;
-          reverse(9);
+          idol_num = 2;
+          reverse(4);
+          motor1.powerMotor(15);
+          
+          int start = millis();
+          while(start - millis() < 3000){
+            if(ir1.getValue() > 200 && ir2.getValue() > 200){
+            break;
+            }
+          }
+          brake1(40, motor1, true);
+          idol_num = 2;
+          var = 0;
+          encoder1.reset();
+          encoder2.reset();
           }
         }
       }
@@ -111,7 +167,7 @@ void loop(){
         if(millis() - sonar_r.lastUse > 60){
           int dist = sonar_r.getDistance();
           if(dist < 22 && dist > 8){
-            move(7);
+            move(2);
             pickUpRight();
             idol_num = 3;
         }
@@ -198,6 +254,15 @@ void loop(){
 
 
 
-// } else if (idol_num == 2){
-//     
-//     }
+
+// reverse(23);
+// encoder1.reset();
+// encoder2.reset();
+// pid_tape_45.KP = 13;
+// while(encoder1.getPos() < cm_to_clicks(30)){
+// tapeFollow(pid_tape_45, 45, R1, R2, R3, motor1, motor2);
+// }
+// brake(true);
+// rotateWide(30, false);
+// move(10);
+// }

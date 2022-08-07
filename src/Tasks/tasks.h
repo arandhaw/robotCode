@@ -7,13 +7,15 @@
 #include <Motion/motion.h>
 #include <Sonar.h>
 #include <PID.h>
-#include "SoftwareSerial.h"
 
+#include <servo.h>
 
 extern Sonar sonar_r;
 extern Sonar sonar_l;
 extern Motor motor1;
 extern Motor motor2;
+extern servo claw;
+extern servo arm;
 
 void sonarPID(PID &pid);
 void findIdol();
