@@ -102,11 +102,11 @@ void manualBrake(int duration1, int duration2, int dir1, int dir2){
   while(stop1 == false || stop2 == false){
     if(millis() - start > duration1 && stop1 == false){
       motor1.powerMotor(0);
-      stop1 == true;
+      stop1 = true;
     }
     if(millis() - start > duration2 && stop2 == false){
       motor2.powerMotor(0);
-      stop2 == true;
+      stop2 = true;
     }
   }
 }
@@ -208,7 +208,7 @@ void rotate90(bool dir){
   encoder2.reset();
   PID pidx(50, 0, 0, 1000);
   while(spin(pidx, 1100, 20, dir)){}
-  manualBrake(60, 60, !dir, dir);
+  manualBrake(60, 60, dir, !dir);
 }
 
 void rotateWide(int angle, bool dir){

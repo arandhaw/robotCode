@@ -46,6 +46,9 @@ PID pidmotion(40, 0, 0, 0);
 
 void setup(){
   setup_OLED();
+  rotate(45, false);
+  delay(5000);
+  while(true){}
   // while(true){
   //   //OLED("Hall effect:", hall.getValue());
   //   test_sonar();
