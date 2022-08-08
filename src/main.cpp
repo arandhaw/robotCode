@@ -73,10 +73,31 @@ void findTape(ReflectSensor R1, ReflectSensor R2, ReflectSensor R3) {
 
 void setup(){
   setup_OLED();
-  rotate(45, true);
-  while(true){
-    
-  }
+  // pinMode(PA11, INPUT);
+  // pinMode(PA12, OUTPUT);
+
+  // while(true) {
+  //     // digitalWrite(PA12, LOW);
+  //     // delay(1000);
+  //     digitalWrite(PA12, HIGH);
+  //     // delay(1000);
+  // }
+
+  // digitalWrite(PA11, LOW);
+  // delay(1000);
+  // OLED("HI IM HERE", 0);
+  // delay(2000);
+  // digitalWrite(PA11, HIGH);
+  //   OLED("LOWER ZIPLINE", 1);
+  //   while(digitalRead(PA12) == LOW) {
+
+  //   }
+  //   while (digitalRead(PA12) == HIGH) {
+  //         OLED("DONE LOWERING", 1);
+
+  //   }
+
+
   //PID pid1(30, 0, 0, 0);
   //int clicks = round((float) 1180*45/90); //1210 is a constant - clicks for 90 degree rotation
   // PID pid1(30, 0, 0, 1000);
@@ -98,7 +119,7 @@ void setup(){
   
 }
 
-int idol_num = 0; //global variable to keep track of state
+int idol_num = 2; //global variable to keep track of state
 int chickenWire = 0;
 int var = 0; 
 int state = 0;
@@ -131,12 +152,11 @@ void loop(){
       if (pid_tape_45.error == -100 && chickenWire == 0) {
         chickenWire = 1;
         brake(true);
-        delay(2000);
+        delay(1000);
       } 
       if (chickenWire == 1) {
         rotate(10, false);
-        move(16);
-
+        move(18);
         findTape(R1, R2, R3);
         chickenWire = 2;
       } else {
@@ -155,29 +175,30 @@ void loop(){
           move(1);
          // brake(true);
           pickUpRight();
+          digitalWrite(PA11, HIGH); //output high
+          while (digitalRead(PA12) == LOW) {
+
+          }
           idol_num = 2;
           delay(1000);
           reverse(5);
           motor1.powerMotor(15);
           int start = millis();
-          while(millis() - start < 3000){
-            if(ir1.getValue() > 200 && ir2.getValue() > 200){
-              brake1(40, motor1, true);
-              var = 1;
-              break;
-            }
+          while(millis() - start < 2750){
+            // if(ir1.getValue() > 200 && ir2.getValue() > 200){
+            //   brake1(40, motor1, true);
+            //   var = 1;
+            //   break;
+            // }
           }
-          if(var != 1){
-            brake1(10, motor1, true);
-          }
+          brake1(10, motor1, true);
           
           delay(1000);
           move(33);
           //delay(1000);
           delay(1000);
           rotate(10, false);
-
-
+          delay(1000);
           idol_num = 2;
           var = 0;
           encoder1.reset();
@@ -190,8 +211,8 @@ void loop(){
       if(encoder1.getPos() > cm_to_clicks(100)){
         if(millis() - sonar_r.lastUse > 60){
           int dist = sonar_r.getDistance();
-          if(dist < 22 && dist > 8){
-            move(2);
+          if(dist < 23 && dist > 15){
+            move(3.5);
             pickUpRight();
             idol_num = 3;
         }
@@ -201,11 +222,10 @@ void loop(){
       if(var == 0){
         rotate90(false);
         delay(1000);
-        move(10);
-        delay(1000);
+        reverse(7);
         encoder1.reset();
         encoder2.reset();
-        while(spinWide(2200, 40, false)){}
+        while(spinWide(2100, 40, false)){}
         brake1(80, motor1, true);
         delay(1000);
         encoder1.reset();
