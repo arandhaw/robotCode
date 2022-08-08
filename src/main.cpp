@@ -46,14 +46,10 @@ void setup(){
   //digitalWrite(OUTPUT_PIN, false); //initialize output pin
   inputValue = false;
   state = 0;
-  
-  //lowerZipline();
+  lowerZipline();
   while(true){
-  if(bottomSwitch.getValue() == true){
-    upMotor.powerMotor(-100);
-  } else {
-    upMotor.powerMotor(0);
-  }
+    
+    delay(1000);
   // delay(2000);
   // lowerZipline();
   // delay(2000);
