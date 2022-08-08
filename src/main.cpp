@@ -1,6 +1,7 @@
 //c++ libraries
 #include <cmath>
 //self made libraries
+#include <Zipline.h>
 #include <OLED.h>
 #include <Arduino.h>
 #include <Encoders.h>
@@ -18,14 +19,15 @@
 #include "tests/tests.h"
 #include "IRFollow/IRFollow.h"
 #include <SoftwareSerial.h>
+//#include <Zipline.h>
 
-SoftwareSerial myserial(PB11, PB10); //PB11 PB10 works best
+//SoftwareSerial myserial(PB11, PB10); //PB11 PB10 works best
 
 // #include "runMotors.h" 
 // #include "testMotors.h" 
 
 //Servo myservo;
-
+Zipline zipline(PA10, PA11); //output pin, input pin
 ReflectSensor R1(PA7); //left
 ReflectSensor R2(PA6); //middle
 ReflectSensor R3(PA5); //right
@@ -48,45 +50,29 @@ PID pid_ir(20, 0, 0, 0);
 PID pidsonar(5, 0, 0, 0);
 PID pidmotion(40, 0, 0, 0);
 
-void findTape(ReflectSensor R1, ReflectSensor R2, ReflectSensor R3) {
-  int startingTime = millis();
-  if (R1.getDigitalValue() == 0 && R2.getDigitalValue() == 0 && R3.getDigitalValue() == 0) {
-    motor1.powerMotor(20, true);
-    motor2.powerMotor(20, false);
-    while (R1.getDigitalValue() == 0 && R2.getDigitalValue() == 0 && R3.getDigitalValue() == 0 && millis() - startingTime < 2000) {
-      if (R1.getDigitalValue() == 1 || R2.getDigitalValue() == 1 || R3.getDigitalValue() == 1) {
-        return;
-      }
-    }
-    motor1.powerMotor(20, false);
-    motor2.powerMotor(20, true);
-    startingTime = millis();
-    while (R1.getDigitalValue() == 0 && R2.getDigitalValue() == 0 && R3.getDigitalValue() == 0 && millis() - startingTime < 4000) {
-      if (R1.getDigitalValue() == 1 || R2.getDigitalValue() == 1 || R3.getDigitalValue() == 1) {
-        return;
-      }
-    }
-  } else {
-    return;
-  }
-}
+
 
 void setup(){
   setup_OLED();
-  rotate(45, false);
-  delay(5000);
-  while(true){}
-
+  while(true){
+    zipline.send();
+    while(zipline.receive() == false){}
+    delay(2000);
+  }
   // while(true){
+  //   zipline.send();
+  //   delay(2000);
+  //   zipline.send();
+  //   delay(2000);
   // }
 
   
 }
 
 int idol_num = 0; //global variable to keep track of state
-int chickenWire = 0;
 int var = 0; 
 int state = 0;
+int zip = 0;
 PID pid2(30, 0, 0, 1000);
 
 void loop(){
@@ -107,26 +93,19 @@ void loop(){
           delay(1000);
           pickUpRight();
           idol_num = 1;
-          reverse(5);
+          reverse(20);
+          delay(1000);
+          rotateWide(60, false);
+          delay(1000);
+          move(50);
+          findTape(R1, R2, R3);
         }
       }
     }
   } else if (idol_num == 1){
-    if( encoder1.getPos() < cm_to_clicks(80) ){
-      if (pid_tape_45.error == -100 && chickenWire == 0) {
-        chickenWire = 1;
-        brake(true);
-        delay(2000);
-      } 
-      if (chickenWire == 1) {
-        rotate(10, false);
-        move(16);
-
-        findTape(R1, R2, R3);
-        chickenWire = 2;
-      } else {
-        tapeFollow(pid_tape_45, 45, R1, R2, R3, motor1, motor2);
-      }
+    if( encoder1.getPos() < cm_to_clicks(10) ){
+      
+      tapeFollow(pid_tape_45, 45, R1, R2, R3, motor1, motor2);
       
     } else {
       tapeFollow(pid_tape_45, 45, R1, R2, R3, motor1, motor2);
@@ -138,7 +117,6 @@ void loop(){
 
         if(dist < 25 && dist > 8){
           move(1);
-         // brake(true);
           pickUpRight();
           idol_num = 2;
           delay(1000);
@@ -160,7 +138,7 @@ void loop(){
           move(33);
           //delay(1000);
           delay(1000);
-          rotate(10, false);
+          rotate(20, false);
 
 
           idol_num = 2;

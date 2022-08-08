@@ -3,18 +3,20 @@
 #define ZIPLINE_H 
 
 
-// a class for analog Reflectance Sensors.
+// a class for communicating with the zipline
 #include <wire.h>
 
 class Zipline {
   private:
     int inputPin;
     int outputPin;
+    bool inputValue;
+    bool outputValue;
 
   public:
     Zipline(int inputPin, int outputPin);
     void send();
-    void receive();
+    bool receive();
 };
 
 #endif
