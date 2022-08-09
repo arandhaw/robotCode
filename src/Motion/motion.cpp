@@ -8,8 +8,9 @@ bool goStraight(PID &pid, int dist, int speed){
     pid.sumError += pid.error;
     pid.totalSquaredError += pid.error*pid.error;
 
-    motor1.powerMotor(speed + round( pid.PIDValue() ) + 10, true);
-    motor2.powerMotor(speed - round( pid.PIDValue() ), true);
+    float adjustment = pid.KP*pid.error;
+    motor1.powerMotor(speed + round( adjustment ), true);
+    motor2.powerMotor(speed - round( adjustment ), true);
     OLED_manual3(encoder1.getSpeed(), pid.error, pid.totalSquaredError);
     if(encoder1.getPos() <= dist)
         return true;
@@ -31,8 +32,10 @@ bool spin(PID &pid, int dist, int speed, bool dir){
     pid.sumError += pid.error;
     pid.totalSquaredError += pid.error*pid.error;
 
-    motor1.powerMotor(speed + round(pid.PIDValue()), !dir);
-    motor2.powerMotor(speed - round(pid.PIDValue()), dir);
+    float adjustment = pid.KP*pid.error;
+
+    motor1.powerMotor(speed + round( adjustment ), !dir);
+    motor2.powerMotor(speed - round( adjustment ), dir);
     OLED_manual2(pid.pValue(), pid.iValue(), pid.dValue());
     //OLED_manual3(encoder1.getSpeed(), pid.error, 0);
     
@@ -75,8 +78,9 @@ bool goBackwards(PID &pid, int dist, int speed){
     pid.sumError += pid.error;
     pid.totalSquaredError += pid.error*pid.error;
 
-    motor1.powerMotor(speed + round( pid.PIDValue() ), false);
-    motor2.powerMotor(speed - round( pid.PIDValue() ), false);
+    float adjustment = pid.KP*pid.error;
+    motor1.powerMotor(speed + round( adjustment ), false);
+    motor2.powerMotor(speed - round( adjustment ), false);
     OLED_manual3(encoder1.getSpeed(), pid.error, pid.totalSquaredError);
     if(abs( encoder1.getPos() )<= dist)
         return true;

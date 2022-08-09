@@ -54,53 +54,46 @@ PID pidmotion(40, 0, 0, 0);
 
 void setup(){
   setup_OLED();
-  while(true){
-    zipline.send();
-    while(zipline.receive() == false){}
-    delay(2000);
-  }
-
-  // while(true){
-  //   zipline.send();
-  //   delay(2000);
-  //   zipline.send();
-  //   delay(2000);
-  // }
+  delay(250);
 
   
 }
 
-int idol_num = 2; //global variable to keep track of state
+int idol_num = 0; //global variable to keep track of state
 int chickenWire = 0;
 int var = 0; 
 int state = 0;
 int zip = 0;
+int timer;
 PID pid2(30, 0, 0, 1000);
 
 void loop(){
   if(idol_num == 0){
-    if( encoder1.getPos() < cm_to_clicks(180)){
+    if(zip == 0){
+      zipline.send();
+      zip++;
+      while(zipline.receive() == false){}
+      timer = millis();
+      pwm_start(PB_6, 100, 16, TimerCompareFormat_t::PERCENT_COMPARE_FORMAT); //raise arm
+    }
+    if(millis() - timer < 2000){
       tapeFollow(pid_tape_45, 45, R1, R2, R3, motor1, motor2);
     } else {
       tapeFollow(pid_tape_45, 45, R1, R2, R3, motor1, motor2);
-      if(millis() - sonar_r.lastUse > 30){
+      if(millis() - sonar_r.lastUse > 45){
         //sonar_data.add(sonar_r.getDistance());
         int dist = sonar_r.getDistance();
-        if(dist < 22 && dist > 8){ sonar_bool.add(true);
-        } else { sonar_bool.add(false); }
 
-        if(dist < 25 && dist > 8){
-          move(3);
+        if(dist < 30 && dist > 8){
+          move(2);
           //brake(true);
           delay(1000);
           pickUpRight();
           idol_num = 1;
-          reverse(20);
-          delay(1000);
-          rotateWide(60, false);
-          delay(1000);
-          move(50);
-          findTape(R1, R2, R3);
+          zip = 0;
+          encoder1.reset();
+          encoder2.reset();
+          reverse(5);
         }
       }
     }
@@ -130,34 +123,40 @@ void loop(){
         } else { sonar_bool.add(false); }
 
         if(dist < 25 && dist > 8){
-          move(1);
+          move(2);
           pickUpRight();
-          digitalWrite(PA11, HIGH); //output high
-          while (digitalRead(PA12) == LOW) {
-
+          encoder1.reset();
+          encoder2.reset();
+          reverse(4);
+          if(zip == 0){
+            zipline.send();
+            while(zipline.receive() == false){}
+            zip++;
           }
+          
           idol_num = 2;
-          delay(1000);
-          reverse(5);
+          delay(1500);
           motor1.powerMotor(15);
           int start = millis();
-          while(millis() - start < 2750){
-            // if(ir1.getValue() > 200 && ir2.getValue() > 200){
-            //   brake1(40, motor1, true);
-            //   var = 1;
-            //   break;
-            // }
+          while(millis() - start < 3500){
+          //  if(ir1.getValue() > 200 && ir2.getValue() > 200){
+          //     brake1(40, motor1, true);
+          //     var = 1;
+          //     break;
+          //  }
           }
-          brake1(10, motor1, true);
-          
+          brake1(35, motor1, true);
           delay(1000);
-          move(33);
+          encoder1.reset();
+          encoder2.reset();
+          move(20);
           //delay(1000);
           delay(1000);
-          rotate(10, false);
+          rotate(20, false);
           delay(1000);
-          idol_num = 2;
+          idol_num = 69;
           var = 0;
+          zip = 0;
           encoder1.reset();
           encoder2.reset();
           }
@@ -165,11 +164,16 @@ void loop(){
       }
   } else if (idol_num == 2){
       IRFollow(pid_ir, 40);
-      if(encoder1.getPos() > cm_to_clicks(100)){
+      if(zip == 0){
+        timer = millis();
+        zipline.send();
+        zip++;
+      }
+      if(millis() - timer > 3000){
         if(millis() - sonar_r.lastUse > 60){
           int dist = sonar_r.getDistance();
           if(dist < 23 && dist > 15){
-            move(3.5);
+            move(3);
             pickUpRight();
             idol_num = 3;
         }
@@ -222,48 +226,5 @@ void loop(){
     motor2.powerMotor(0);
   }
 
-  // if(idol_num == 10){
-  //   PID pid_1(30, 0, 0, 1000);
-  //   goStraight2(pid_1, cm_to_clicks(100), 10, encoder1, encoder2, motor1, motor2);
-
-  //   if(R1.getDigitalValue() == 1){
-  //     PID pid(30, 0, 0, 1000);
-  //     int d;
-  //     int L = 2;
-  //     encoder1.reset();
-  //     encoder2.reset();
-  //     while(goStraight2(pid, cm_to_clicks(10000), 10, encoder1, encoder2, motor1, motor2)){
-  //       if(R3.getDigitalValue() == 1){
-  //         d = encoder1.getPos();
-  //         stop_robot();
-  //         break;
-  //       }
-  //     }
-      
-  //     float angle = 180/PI*std::atan((float) d/L);
-  //     rotate(angle, false);
-  //     encoder1.reset();
-  //     encoder2.reset();
-  //     pid_1.reset();
-  //   }
-  // }
-  // motor1.powerMotor(50);
-  // motor2.powerMotor(50);
-  //OLED_manual(encoder1.getSpeed(), 0, encoder2.getSpeed(), 0);
-  //encoder1.testCounters();
-
 }
 
-
-
-// reverse(23);
-// encoder1.reset();
-// encoder2.reset();
-// pid_tape_45.KP = 13;
-// while(encoder1.getPos() < cm_to_clicks(30)){
-// tapeFollow(pid_tape_45, 45, R1, R2, R3, motor1, motor2);
-// }
-// brake(true);
-// rotateWide(30, false);
-// move(10);
-// }

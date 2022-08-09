@@ -1,6 +1,9 @@
 #include "Encoders.h"
 #include <OLED.h>
 
+
+int pin1;
+
 volatile int count1 = 0;
 volatile int count2 = 0;
 volatile int count3 = 0;
@@ -27,18 +30,20 @@ void handle_interrupt1(){
         secondLastTime1 = lastTime1;
         lastTime1 = micros();
     }
-    if(b2 == false){
+
+    bool val = digitalRead(PB13);
+
+    if(val == false){
         pos1++;
         dir1 = true;
-    }
-    if(b2 == true){
+    } else if(val == true){
         pos1--;
         dir1 = false;
     }
 }
 void handle_interrupt2(){
-    count2++;
-    b2 = !b2;
+    // count2++;
+    // b2 = !b2;
 }
 void handle_interrupt3(){
     count3++;
@@ -46,18 +51,20 @@ void handle_interrupt3(){
         secondLastTime2 = lastTime2;
         lastTime2 = micros();
     }
-    if(b4 == false){
+
+    bool val = digitalRead(PB14);
+
+    if(val == false){
         pos2++;
         dir2 = true;
-    }
-    if(b4 == true){
+    } else if(val == true){
         pos2--;
         dir2 = false;
     }
 }
 void handle_interrupt4(){
-    count4++;
-    b4 = !b4;
+    // count4++;
+    // b4 = !b4;
 }
 
 Encoder::Encoder(int pin1, int pin2, int num) {
@@ -68,14 +75,14 @@ Encoder::Encoder(int pin1, int pin2, int num) {
     //declare interrupt pins, define interrupt function
     if(num == 1){
         attachInterrupt(digitalPinToInterrupt(pin1), handle_interrupt1, RISING);
-        attachInterrupt(digitalPinToInterrupt(pin2), handle_interrupt2, CHANGE);
+        // attachInterrupt(digitalPinToInterrupt(pin2), handle_interrupt2, CHANGE);
     }
 
     if(num == 2){
         attachInterrupt(digitalPinToInterrupt(pin1), handle_interrupt3, RISING);
-        attachInterrupt(digitalPinToInterrupt(pin2), handle_interrupt4, CHANGE);
+        // attachInterrupt(digitalPinToInterrupt(pin2), handle_interrupt4, CHANGE);
     }
-    calibrate();
+    // calibrate();
     reset();
 }
 
