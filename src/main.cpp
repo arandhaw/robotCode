@@ -55,8 +55,6 @@ PID pidmotion(40, 0, 0, 0);
 void setup(){
   setup_OLED();
   delay(250);
-
-  
 }
 
 int idol_num = 0; //global variable to keep track of state
@@ -127,7 +125,7 @@ void loop(){
           pickUpRight();
           encoder1.reset();
           encoder2.reset();
-          reverse(4);
+          reverse(4.5);
           if(zip == 0){
             zipline.send();
             while(zipline.receive() == false){}
@@ -138,7 +136,7 @@ void loop(){
           delay(1500);
           motor1.powerMotor(15);
           int start = millis();
-          while(millis() - start < 3500){
+          while(millis() - start < 4000){
           //  if(ir1.getValue() > 200 && ir2.getValue() > 200){
           //     brake1(40, motor1, true);
           //     var = 1;
@@ -152,9 +150,14 @@ void loop(){
           move(20);
           //delay(1000);
           delay(1000);
-          rotate(20, false);
+          //rotate(15, false);
+          while(ir1.getValue() < 400 && ir2.getValue() < 400){
+            spin(pidmotion, 10, 15, false);
+            manualBrake(40, 40, true, false);
+          }
+          move(10);
           delay(1000);
-          idol_num = 69;
+          idol_num = 2;
           var = 0;
           zip = 0;
           encoder1.reset();
@@ -168,11 +171,12 @@ void loop(){
         timer = millis();
         zipline.send();
         zip++;
+        while(zipline.receive() == false){}
       }
       if(millis() - timer > 3000){
         if(millis() - sonar_r.lastUse > 60){
           int dist = sonar_r.getDistance();
-          if(dist < 23 && dist > 15){
+          if(dist < 23 && dist > 6){
             move(3);
             pickUpRight();
             idol_num = 3;
@@ -186,7 +190,7 @@ void loop(){
         reverse(7);
         encoder1.reset();
         encoder2.reset();
-        while(spinWide(2100, 40, false)){}
+        while(spinWide(2400, 40, false)){}
         brake1(80, motor1, true);
         delay(1000);
         encoder1.reset();
@@ -200,7 +204,7 @@ void loop(){
           if(dist < 25 && dist > 8){
             move(3);
             pickUpRight();
-            idol_num = 69;
+            idol_num = 4;
             var = 0;
           }
         }

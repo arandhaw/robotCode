@@ -73,7 +73,7 @@ void findTape(ReflectSensor R1, ReflectSensor R2, ReflectSensor R3) {
   if (R1.getDigitalValue() == 0 && R2.getDigitalValue() == 0 && R3.getDigitalValue() == 0) {
     motor1.powerMotor(20, true);
     motor2.powerMotor(20, false);
-    while (R1.getDigitalValue() == 0 && R2.getDigitalValue() == 0 && R3.getDigitalValue() == 0 && millis() - startingTime < 2000) {
+    while (R1.getDigitalValue() == 0 && R2.getDigitalValue() == 0 && R3.getDigitalValue() == 0 && millis() - startingTime < 1000) {
       if (R1.getDigitalValue() == 1 || R2.getDigitalValue() == 1 || R3.getDigitalValue() == 1) {
         return;
       }

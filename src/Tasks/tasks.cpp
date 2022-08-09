@@ -107,7 +107,7 @@ void pickUpRight() {
   delay(1000);
   claw.move(174); //close claw
   delay(1000);
-  pwm_start(PB_6, 100, 16, TimerCompareFormat_t::PERCENT_COMPARE_FORMAT); //raise arm
+  pwm_start(PB_6, 100, 17, TimerCompareFormat_t::PERCENT_COMPARE_FORMAT); //raise arm
   delay(1000);
   claw.move(287); //open claw in box
   delay(1000);
