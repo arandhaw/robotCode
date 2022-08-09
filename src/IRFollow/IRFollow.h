@@ -7,12 +7,16 @@
 #include <PID.h>
 #include <IRSensor.h>
 #include <Arduino.h>
+#include "Motion/motion.h"
 
 extern Motor motor1;
 extern Motor motor2;
 extern IRSensor ir1;
 extern IRSensor ir2;
+// extern ReflectSensor right;
+// extern ReflectSensor left;
 
 void IRFollow(PID &pid, int speed);
+void zigzag(int speed);
 
 #endif
