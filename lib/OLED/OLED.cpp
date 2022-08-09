@@ -12,8 +12,8 @@ Adafruit_SSD1306 display_handler(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET)
 
 void setup_OLED() {
   
-  Wire.setSCL(PB10);
-  Wire.setSDA(PB11);
+//   Wire.setSCL(PB10);
+//   Wire.setSDA(PB11);
   display_handler.begin(SSD1306_SWITCHCAPVCC, 0x3C);
   // Displays Adafruit logo by default. call clearDisplay immediately if you don't want this.
   display_handler.display();
