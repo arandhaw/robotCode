@@ -17,3 +17,9 @@ void IRFollow(PID &pid, int speed) {
     OLED2("IR1, IR2", reading1, reading2);
 
 }
+
+void zigzag(int speed){
+    return;
+
+
+}

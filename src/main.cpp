@@ -1,5 +1,6 @@
 //c++ libraries
 #include <cmath>
+#include <SoftwareSerial.h>
 //self made libraries
 #include <Zipline.h>
 #include <OLED.h>
@@ -11,22 +12,15 @@
 #include <IRSensor.h>
 #include <servo.h>
 #include <DigitalSensor.h>
+#include <RunOnce.h>
 //program files
-// #include "sweep.h"
 #include "Tasks/tasks.h"
 #include "Motion/motion.h"
 #include "tapeFollow/tapeFollow.h"
 #include "tests/tests.h"
 #include "IRFollow/IRFollow.h"
-#include <SoftwareSerial.h>
-//#include <Zipline.h>
-
 //SoftwareSerial myserial(PB11, PB10); //PB11 PB10 works best
 
-// #include "runMotors.h" 
-// #include "testMotors.h" 
-
-//Servo myservo;
 Zipline zipline(PA10, PA11); //output pin, input pin
 ReflectSensor R1(PA7); //left
 ReflectSensor R2(PA6); //middle
@@ -50,28 +44,25 @@ PID pid_ir(20, 0, 0, 0);
 PID pidsonar(5, 0, 0, 0);
 PID pidmotion(40, 0, 0, 0);
 
-
+RunOnce a;
 
 void setup(){
   setup_OLED();
   delay(250);
-
-  
 }
 
 int idol_num = 0; //global variable to keep track of state
 int chickenWire = 0;
 int var = 0; 
 int state = 0;
-int zip = 0;
+RunOnce zip1, zip2, zip3;
 int timer;
 PID pid2(30, 0, 0, 1000);
 
 void loop(){
   if(idol_num == 0){
-    if(zip == 0){
+    while(zip1.once()){
       zipline.send();
-      zip++;
       while(zipline.receive() == false){}
       timer = millis();
       pwm_start(PB_6, 100, 16, TimerCompareFormat_t::PERCENT_COMPARE_FORMAT); //raise arm
@@ -90,7 +81,6 @@ void loop(){
           delay(1000);
           pickUpRight();
           idol_num = 1;
-          zip = 0;
           encoder1.reset();
           encoder2.reset();
           reverse(5);
@@ -106,7 +96,7 @@ void loop(){
         delay(1000);
       } 
       if (chickenWire == 1) {
-        rotate(10, false);
+        rotate(8, false);
         move(18);
         findTape(R1, R2, R3);
         chickenWire = 2;
@@ -127,18 +117,17 @@ void loop(){
           pickUpRight();
           encoder1.reset();
           encoder2.reset();
-          reverse(4);
-          if(zip == 0){
+          reverse(4.5);
+          while(zip2.once()){
             zipline.send();
             while(zipline.receive() == false){}
-            zip++;
           }
           
           idol_num = 2;
           delay(1500);
           motor1.powerMotor(15);
           int start = millis();
-          while(millis() - start < 3500){
+          while(millis() - start < 4000){
           //  if(ir1.getValue() > 200 && ir2.getValue() > 200){
           //     brake1(40, motor1, true);
           //     var = 1;
@@ -152,27 +141,31 @@ void loop(){
           move(20);
           //delay(1000);
           delay(1000);
-          rotate(20, false);
+          //rotate(15, false);
+          while(ir1.getValue() < 400 && ir2.getValue() < 400){
+              spin(pidmotion, 10, 15, false);
+              manualBrake(40, 40, true, false);
+           }
+           move(10);
           delay(1000);
-          idol_num = 69;
+          idol_num = 2;
           var = 0;
-          zip = 0;
           encoder1.reset();
           encoder2.reset();
           }
         }
       }
   } else if (idol_num == 2){
-      IRFollow(pid_ir, 40);
-      if(zip == 0){
+      while(zip3.once()){
         timer = millis();
         zipline.send();
-        zip++;
+        while(zipline.receive() == false){}
       }
-      if(millis() - timer > 3000){
+       IRFollow(pid_ir, 40);
+      if(millis() - timer > 1000){
         if(millis() - sonar_r.lastUse > 60){
           int dist = sonar_r.getDistance();
-          if(dist < 23 && dist > 15){
+          if(dist < 25 && dist > 6){
             move(3);
             pickUpRight();
             idol_num = 3;
@@ -186,7 +179,7 @@ void loop(){
         reverse(7);
         encoder1.reset();
         encoder2.reset();
-        while(spinWide(2100, 40, false)){}
+        while(spinWide(2300, 40, false)){}
         brake1(80, motor1, true);
         delay(1000);
         encoder1.reset();

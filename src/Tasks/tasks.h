@@ -22,5 +22,6 @@ void sonarPID(PID &pid);
 void findIdol();
 void pickUpRight();
 void resetClaw();
+void pickUpRightNoHall();
 
 #endif
