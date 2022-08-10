@@ -51,7 +51,7 @@ void setup(){
   delay(250);
 }
 
-int idol_num = 7; //global variable to keep track of state
+int idol_num = 41; //global variable to keep track of state
 int chickenWire = 0;
 int var = 0; 
 int state = 0;
@@ -236,7 +236,7 @@ void loop(){
       if(millis() - sonar_r.lastUse > 60){
           int dist = sonar_r.getDistance();
           if(dist < 25 && dist > 8){
-            rotateWide(10, false);
+            rotateWide(17, false);
             pickUpRight();
             idol_num = 6;
             break;
@@ -244,28 +244,52 @@ void loop(){
       }
     }
     rotateWide2(130, false);
-  } else if(idol_num == 6){
+  } else if(idol_num == 6){  //going up the bridge
     encoder1.reset();
     encoder2.reset();
     while (encoder1.getPos() < cm_to_clicks(170)) {
       zigzag(30, 10);
+      if(encoder1.getPos() > cm_to_clicks(100)){
+        if(right.getValue() == true){
+          break;
+        }
+      }
     }
-    motor1.powerMotor(0);
-    motor2.powerMotor(0);
+    manualBrake(60, 60, false, false);
+    delay(2000);
+    rotate(18, false);
+    move(26);
     idol_num = 7;
-  } else if(idol_num == 7) {
-    while(spin(pidmotion, 10000, 20, false)) {
+  } else if(idol_num == 7) { 
+    rotateWide(30, false);
+    delay(1000);
+    while(spinWide(5000, 20, false)) {
       if(millis() - sonar_r.lastUse > 60){
         int dist = sonar_r.getDistance();
-          if(dist < 25 && dist > 5){
-            brakeSpin(false);
-            pickUpRight();
-            idol_num = 69;
+          if(dist < 17 && dist > 9){
+            rotateWide(12, false);
+            pickUpRightNoHall();
             break;
           }
       }
     }
+    delay(1000);
+    reverse(3);
+    delay(1000);
+    rotate(30, false);
+    delay(1000);
+    reverse(10);
+    delay(1000);
+    rotate(150, false);
+    delay(1000);
+    reverse(30);
+    zipline.send();
+    while(zipline.receive() == false){}
+    while(goStraight(pidmotion, cm_to_clicks(8), 12)){}
+    zipline.send();
+    idol_num = 69;
   }
 
+  //end of course
 }
 
