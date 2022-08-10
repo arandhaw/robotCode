@@ -39,10 +39,11 @@ DigitalSensor hall(PA12); //change
 DataBuffer<bool> sonar_bool(50, 0);
 DataBuffer<int> sonar_data(5, 100);
 PID pid_tape_45(10, 0, 5, 0);
-PID pid_ir(20, 0, 0, 0);
+PID pid_ir(30, 0, 0, 0);
 
 PID pidsonar(5, 0, 0, 0);
 PID pidmotion(40, 0, 0, 0);
+PID pidIRFind(15, 0,0,0);
 
 RunOnce a;
 
@@ -55,7 +56,7 @@ int idol_num = 0; //global variable to keep track of state
 int chickenWire = 0;
 int var = 0; 
 int state = 0;
-RunOnce zip1, zip2, zip3;
+RunOnce zip1, zip2, zip3, zip4;
 int timer;
 PID pid2(30, 0, 0, 1000);
 
@@ -141,12 +142,9 @@ void loop(){
           move(20);
           //delay(1000);
           delay(1000);
-          //rotate(15, false);
-          while(ir1.getValue() < 400 && ir2.getValue() < 400){
-              spin(pidmotion, 10, 15, false);
-              manualBrake(40, 40, true, false);
-           }
-           move(10);
+          rotate(10, false);
+          delay(1000);
+           move(12);
           delay(1000);
           idol_num = 2;
           var = 0;
@@ -161,12 +159,16 @@ void loop(){
         zipline.send();
         while(zipline.receive() == false){}
       }
+      // while(ir1.getValue() < 500 && ir2.getValue() < 500){
+      //   spin(pidmotion, 10, 15, false);
+      //   manualBrake(40, 40, true, false);
+      // }
        IRFollow(pid_ir, 40);
       if(millis() - timer > 1000){
         if(millis() - sonar_r.lastUse > 60){
           int dist = sonar_r.getDistance();
           if(dist < 25 && dist > 6){
-            move(3);
+            move(3.5);
             pickUpRight();
             idol_num = 3;
         }
@@ -176,7 +178,7 @@ void loop(){
       if(var == 0){
         rotate90(false);
         delay(1000);
-        reverse(7);
+        reverse(2.5);
         encoder1.reset();
         encoder2.reset();
         while(spinWide(2300, 40, false)){}
@@ -191,7 +193,7 @@ void loop(){
         if(millis() - sonar_r.lastUse > 60){
           int dist = sonar_r.getDistance();
           if(dist < 25 && dist > 8){
-            move(3);
+            move(4);
             pickUpRight();
             idol_num = 4;
             var = 0;
@@ -200,21 +202,41 @@ void loop(){
       }
   } else if (idol_num == 4){
     if(var == 0){
-      rotateWide(90, false);
-      rotate90(false);
+      //rotate(180, false);
       pid_ir.reset();
+      encoder1.reset();
+      encoder2.reset();
+      // while(ir1.getValue() < 600 && ir2.getValue() < 600){
+      //   spin(pidmotion, 10000, 15, false);
+      // }
+      rotate(190, false);
+      //manualBrake(40, 40, true, false);
       var = 1;
       encoder1.reset();
       encoder2.reset();
       
     }
     IRFollow(pid_ir, 40);
-    if(encoder1.getPos() > cm_to_clicks(100)){
+    if(encoder1.getPos() > cm_to_clicks(80)){
       brake(true);
-      idol_num = 69;
+      encoder1.reset();
+      encoder2.reset();
+      
+      while(goStraight(pidmotion, cm_to_clicks(18), 10)){}
+
+
+      idol_num = 5;
       var = 0;
     }
-  } else if (idol_num == 69){
+  } else if (idol_num == 5) {
+      while(zip4.once()){
+        zipline.send();
+        while(zipline.receive() == false){}
+    }
+    idol_num = 69;
+
+  }
+   else if (idol_num == 69){
     motor1.powerMotor(0);
     motor2.powerMotor(0);
   }

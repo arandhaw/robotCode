@@ -18,5 +18,6 @@ extern IRSensor ir2;
 
 void IRFollow(PID &pid, int speed);
 void zigzag(int speed);
+void IRFind(PID &pid);
 
 #endif
