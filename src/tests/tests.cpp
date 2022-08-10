@@ -5,13 +5,11 @@ void test_servos(){
     pickUpRight();
 }
 
-DataBuffer<int> test_data(5, 100);
 void test_pickup(){
     if(millis() - sonar_r.lastUse > 60){
-        test_data.add(sonar_r.getDistance());
-        if(test_data.runningAvg(3) < 25){ 
+        int dist = sonar_r.getDistance();
+        if(dist < 25 && dist > 8){ 
           pickUpRight();
-          test_data.reset(100);
         }
     }
 }
@@ -54,4 +52,8 @@ int test_sonars(){
         OLED_manual2(error, reading1, reading2);
     }
     return error;
+}
+
+void test_edge(){
+    OLED2("Right, left", right.getValue(), left.getValue());
 }
