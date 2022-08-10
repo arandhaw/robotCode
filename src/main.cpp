@@ -31,7 +31,6 @@ DigitalSensor topSwitch(PB8);
 DigitalSensor bottomSwitch(PB7);
 DigitalSensor bluepill(PA10);
 
-int state;
 bool inputValue;
 bool outputValue;
 
@@ -45,14 +44,16 @@ void lowerTime(int time);
 void ride();
 void doZipline();
 //setup function
+
 void setup(){
   pinMode(OUTPUT_PIN, OUTPUT);
   digitalWrite(OUTPUT_PIN, LOW); //initialize output pin
   inputValue = false;
-  state = 0;
-  while(true){}
+  delay(1000);
   
 }
+
+int state = 7;
 
 //main loop for program
 void loop(){
@@ -65,6 +66,7 @@ void loop(){
       //OLED("I'm seeing something", state);
     }
   }
+  
   if(state == 1){
     raiseZipline(50);
     sendMessage();
@@ -78,12 +80,29 @@ void loop(){
     sendMessage();
     state++;
   } else if(state == 7){
-    doZipline();
+    raiseZipline(50); // remove later
+    delay(3000);
+    lowerTime(2000);
+    zipMotor.powerMotor(100);
+    delay(2000); //remove later
     sendMessage();
     state++;
-  }
-  
-  else {
+  } else if (state == 8){
+    zipMotor.powerMotor(100);
+  } else if(state == 9){
+    encoder.reset();
+    rideZipline(28);
+    zipMotor.powerMotor(0);
+    delay(500);
+    raiseZipline(50);
+    sendMessage();
+    state++;
+  } else if(state == 11){
+    lowerTime(3500);
+    sendMessage();
+    state++;
+
+  } else {
     upMotor.powerMotor(0);
     zipMotor.powerMotor(0);
   }
