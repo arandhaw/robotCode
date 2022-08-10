@@ -7,7 +7,6 @@ Motor::Motor(int forward_pin, PinName forward_pin_, int reverse_pin, PinName rev
       this->reverse_pin_ = reverse_pin_;
       pinMode(forward_pin, OUTPUT);
       pinMode(reverse_pin, OUTPUT);
-      
     }
 
 void Motor::PWM(int dutycycle, PinName pin){

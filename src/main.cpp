@@ -13,7 +13,7 @@
 #include <servo.h>
 #include <DigitalSensor.h>
 //program files
-// #include "sweep.h"
+#include "helper.h"
 
 
 //SoftwareSerial myserial(PB11, PB10); //PB11 PB10 works best
@@ -24,9 +24,9 @@
 #define OUTPUT_PIN PA11
 #define INPUT_PIN PA10
 
-Motor upMotor(PA2, PA_2, PA3, PA_3); //right motor (slower motor)
-Motor zipMotor(PA0, PA_0, PA1, PA_1); //left motor
-//Encoder encoder(PB15, PB14, 2);
+Motor upMotor(PA2, PA_2, PA3, PA_3); //motor for raising zipline
+Motor zipMotor(PA1, PA_1, PA0, PA_0); //motor at the top
+Encoder encoder(PB6, PB5, 1);
 DigitalSensor topSwitch(PB8);
 DigitalSensor bottomSwitch(PB7);
 DigitalSensor bluepill(PA10);
@@ -38,15 +38,19 @@ bool outputValue;
 void raiseZipline(int pwm);
 void lowerZipline(int pwm);
 void setZipline(int time);
+void rideZipline(int dist);
 void sendMessage();
+void raiseTime(int time);
+void lowerTime(int time);
 void ride();
-
+void doZipline();
 //setup function
 void setup(){
   pinMode(OUTPUT_PIN, OUTPUT);
   digitalWrite(OUTPUT_PIN, LOW); //initialize output pin
   inputValue = false;
   state = 0;
+  while(true){}
   
 }
 
@@ -71,13 +75,29 @@ void loop(){
     state = 4;
   } else if(state == 5){
     raiseZipline(50);
+    sendMessage();
+    state++;
+  } else if(state == 7){
+    doZipline();
+    sendMessage();
+    state++;
   }
   
   else {
     upMotor.powerMotor(0);
+    zipMotor.powerMotor(0);
   }
   //OLED("messages:", state);
 
+}
+
+
+void doZipline(){
+  lowerTime(2000);
+  delay(1000);
+  rideZipline(110); 
+  delay(1000);
+  raiseZipline(50); 
 }
 
 
@@ -94,9 +114,52 @@ void raiseZipline(int pwm){
         upMotor.powerMotor(pwm);
       } 
     }
-
+    start = millis();
+    while(millis() - start < 20){
+      upMotor.powerMotor(-100);
+    }
+    upMotor.powerMotor(0);
 }
 
+void raiseTime(int time){
+  int start = millis();
+  while(millis() - start < time){
+    if(topSwitch.getValue() == true){
+      delayMicroseconds(10);
+      if(topSwitch.getValue() == true){
+        upMotor.powerMotor(0);
+        break;
+      }
+      } else {
+        upMotor.powerMotor(100);
+      } 
+    }
+    start = millis();
+    while(millis() - start < 20){
+      upMotor.powerMotor(-100);
+    }
+    upMotor.powerMotor(0);
+}
+
+void lowerTime(int time){
+  int start = millis();
+  while(millis() - start < time){
+    if(bottomSwitch.getValue() == true){
+      delayMicroseconds(10);
+      if(bottomSwitch.getValue() == true){
+        upMotor.powerMotor(0);
+        break;
+      }
+      } else {
+        upMotor.powerMotor(-100);
+      } 
+    }
+    start = millis();
+    while(millis() - start < 20){
+      upMotor.powerMotor(100);
+    }
+    upMotor.powerMotor(0);
+}
 
 void lowerZipline(int pwm){
   
@@ -113,6 +176,7 @@ void lowerZipline(int pwm){
     }
   }
 
+
 }
 
 // void setZipline(int time){
@@ -124,8 +188,12 @@ void lowerZipline(int pwm){
 //   upMotor.powerMotor(0);
 // }
 
-void ride(){
-  zipMotor.powerMotor(100);
+void rideZipline(int dist){
+  encoder.reset();
+  while(encoder.getCount() < cm_to_clicks(dist)){
+    zipMotor.powerMotor(100);
+  }
+  zipMotor.powerMotor(0);
 }
 
 void sendMessage(){
