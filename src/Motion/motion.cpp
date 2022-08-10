@@ -240,3 +240,42 @@ void rotateWide(int angle, bool dir){
     brake1(80, motor2, true);
   }
 }
+
+void rotateWide2(int angle, bool dir){
+  int clicks = round( (float) angle*2400/90 );
+  encoder1.reset();
+  encoder2.reset();
+  if (dir == false){
+    while(spinWide2(clicks, 40, false)){}
+    brake1(80, motor2, false);
+  } else {
+    while(spinWide2(clicks, 40, true)){}
+    brake1(80, motor1, false);
+  }
+}
+
+bool spinWide2(int dist, int speed, bool dir){
+    
+    if(dir == false){
+      motor2.powerMotor(speed, false);
+      OLED_manual3(encoder1.getSpeed(), 0, 0);
+      if(abs( encoder2.getPos() ) <= dist){
+        return true;
+      } else { 
+        motor1.powerMotor(0);
+        motor2.powerMotor(0);
+        return false; }
+
+    } else {
+      motor1.powerMotor(speed, false);
+      OLED_manual3(encoder1.getSpeed(), 0, 0);
+      if(abs( encoder1.getPos() ) <= dist){
+        return true;
+      } else { 
+        motor1.powerMotor(0);
+        motor2.powerMotor(0);
+        return false; 
+      }
+
+    }
+}

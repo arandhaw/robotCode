@@ -17,6 +17,7 @@ bool goStraight(PID &pid, int dist, int speed);
 bool goBackwards(PID &pid, int dist, int speed);
 bool spin(PID &pid, int dist, int speed, bool dir);
 bool spinWide(int dist, int speed, bool dir);
+bool spinWide2(int dist, int speed, bool dir);
 
 //braking functions
 void brake(bool dir);
@@ -37,6 +38,7 @@ void reverseB(float cm);
 void rotate(float angle, bool dir);
 void rotate90(bool dir);
 void rotateWide(int angle, bool dir);
+void rotateWide2(int angle, bool dir);
 
 //these functions suck
 void stop_robot();

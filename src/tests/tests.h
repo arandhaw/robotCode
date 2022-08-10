@@ -24,6 +24,8 @@ extern Sonar sonar_r;
 extern ReflectSensor R1; //left
 extern ReflectSensor R2; //middle
 extern ReflectSensor R3; //right
+extern DigitalSensor right; //reflectsensor on right
+extern DigitalSensor left; //reflectsensor on left
 extern IRSensor ir1;
 extern IRSensor ir2;
 
@@ -37,4 +39,5 @@ void test_tapefollowing();
 void test_motors();
 void test_IR();
 int test_sonars();
+void test_edge();
 #endif

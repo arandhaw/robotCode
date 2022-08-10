@@ -44,9 +44,9 @@ class DataBuffer{
         
         //average of last n data points
         float runningAvg(int n){
-            int sum;
+            float sum = 0;
             for(int i = 0; i < n; i++){
-                sum += get(n);
+                sum += get(i);
             }
             return (float) sum / n; 
         }
