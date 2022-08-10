@@ -181,7 +181,7 @@ void loop(){
         reverse(2.5);
         encoder1.reset();
         encoder2.reset();
-        while(spinWide(2300, 40, false)){}
+        while(spinWide(2350, 40, false)){}
         brake1(80, motor1, true);
         delay(1000);
         encoder1.reset();
@@ -232,6 +232,11 @@ void loop(){
       while(zip4.once()){
         zipline.send();
         while(zipline.receive() == false){}
+        //Do double wheel spin turn
+        //do edge bounce manouver
+        //wait for some encoder distance
+        //double wheel rotate left
+        //detect with sonar
     }
     idol_num = 69;
 
