@@ -236,29 +236,29 @@ void loop(){
       if(millis() - sonar_r.lastUse > 60){
           int dist = sonar_r.getDistance();
           if(dist < 25 && dist > 8){
-            rotateWide(17, false);
+            rotateWide(15, false);
             pickUpRight();
             idol_num = 6;
             break;
           }
       }
     }
-    rotateWide2(130, false);
+    rotateWide2(125, false);
   } else if(idol_num == 6){  //going up the bridge
     encoder1.reset();
     encoder2.reset();
-    while (encoder1.getPos() < cm_to_clicks(170)) {
-      zigzag(30, 10);
-      if(encoder1.getPos() > cm_to_clicks(100)){
-        if(right.getValue() == true){
-          break;
-        }
-      }
+    while(encoder1.getPos() < cm_to_clicks(15)){
+      goStraight(pidmotion, 1000, 30);
     }
-    manualBrake(60, 60, false, false);
+    while (encoder1.getPos() < cm_to_clicks(150)) {
+      zigzag(30, 10);
+    }
+    brake(true);
     delay(2000);
-    rotate(18, false);
-    move(26);
+    rotate(12, false);
+    move(30);
+    //while(goStraight(pidmotion, 180, 30)){}
+    //brake(true);
     idol_num = 7;
   } else if(idol_num == 7) { 
     rotateWide(30, false);
