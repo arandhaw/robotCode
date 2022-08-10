@@ -53,7 +53,7 @@ void setup(){
   
 }
 
-int state = 7;
+int state = 1;
 
 //main loop for program
 void loop(){
@@ -84,7 +84,7 @@ void loop(){
     delay(3000);
     lowerTime(2000);
     zipMotor.powerMotor(100);
-    delay(2000); //remove later
+    delay(2000);
     sendMessage();
     state++;
   } else if (state == 8){
@@ -100,6 +100,14 @@ void loop(){
   } else if(state == 11){
     lowerTime(3500);
     sendMessage();
+    state++;
+  } else if(state == 13){
+    raiseZipline(50);
+    sendMessage();
+    state++;
+  } else if(state == 15){
+    lowerTime(3000);
+    rideZipline(200);
     state++;
 
   } else {
