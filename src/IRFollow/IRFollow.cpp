@@ -39,7 +39,7 @@ void IRrotate(PID &pid) {
 int zigzagTimer = -10000;
 bool dir = true;
 
-void zigzag(int speed, int p){
+void zigzag(int speed, int p, int time){
     if(right.getValue() == true){
         zigzagTimer = millis();
         dir = false; //go left
@@ -48,7 +48,7 @@ void zigzag(int speed, int p){
         dir = true; // go right
     } 
 
-    if(millis() - zigzagTimer < 1500){
+    if(millis() - zigzagTimer < time){
         if(dir == false){
             motor1.powerMotor(speed + p);
             motor2.powerMotor(speed - p);
@@ -64,4 +64,40 @@ void zigzag(int speed, int p){
         goStraight(justP, 10000, speed);
     }
     
+}
+
+int lastBounce = -100000;
+int direction = 0;
+
+void zigzag2(int speed, int p, int time){
+    if(millis() - lastBounce < time){
+        if(direction == -1){ //go left
+            motor1.powerMotor(speed + p); 
+            motor2.powerMotor(speed - p);
+            OLED("Go Left", direction);
+        } else if(direction == 1){ //go right
+            motor1.powerMotor(speed - p);
+            motor2.powerMotor(speed + p); 
+            OLED("Go Right", direction);
+        }
+        //go current direction
+    } else {
+
+        if(right.getValue() == 1){
+            direction = -1; //turn left
+            lastBounce = millis();
+        } else if(left.getValue() == 1){
+            direction = 1; //turn right
+            lastBounce = millis();
+        } else {
+            dir = 0; //go straight
+            PID justP(30, 0, 0, 100); // just proportional
+            goStraight(justP, 10000, speed);
+            OLED("Go Straight", direction);
+        }
+    }
+}
+
+void zag(){
+    return;
 }

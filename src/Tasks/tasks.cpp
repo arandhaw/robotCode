@@ -5,8 +5,14 @@
 //DataBuffer<int> sonar_pid_data(3, 10);
 //SoftwareSerial* serialll = nullptr;
 
+bool bombfound = false;
+
 void pickUpRight() {
   
+  if(bombfound == true){
+    pickUpRightNoHall();
+    return;
+  }
   int start; 
   arm.move(620); //raised position
   claw.move(150); //close claw
@@ -29,6 +35,7 @@ void pickUpRight() {
     if(hall.getValue() == LOW){
          delay(500);
          resetClaw();
+         bombfound = true;
          return;
        }
   }
@@ -49,6 +56,7 @@ void pickUpRight() {
     if(hall.getValue() == LOW){
          delay(500);
          resetClaw();
+         bombfound = true;
          return;
        }
   }
@@ -60,6 +68,7 @@ void pickUpRight() {
     if(hall.getValue() == LOW){
          delay(500);
          resetClaw();
+         bombfound = true;
          return;
        }
   }
@@ -83,6 +92,20 @@ void pickUpRightNoHall(){
   delay(1000);
   resetClaw();
 
+}
+
+void pickUpGold(){
+  
+  int start; 
+  arm.move(620); //raised position
+  delay(500);
+  claw.move(573); //open claw
+  delay(500);
+  arm.move(205);
+  delay(500);
+  claw.move(174); //close claw
+  delay(1000);
+  arm.move(600); 
 }
 
 

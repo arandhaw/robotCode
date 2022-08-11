@@ -23,5 +23,5 @@ void findIdol();
 void pickUpRight();
 void resetClaw();
 void pickUpRightNoHall();
-
+void pickUpGold();
 #endif

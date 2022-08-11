@@ -259,67 +259,85 @@ void loop(){
     move(7);
     delay(1000);
     while(spinWide(10000, 30, false)){
-      if(millis() - sonar_r.lastUse > 60){
-          int dist = sonar_r.getDistance();
-          if(dist < 25 && dist > 8){
-            rotateWide(17, false);
-            pickUpRight();
-            idol_num = 8;
-            break;
-          }
+      // if(millis() - sonar_r.lastUse > 60){
+      //     int dist = sonar_r.getDistance();
+      //     if(dist < 25 && dist > 8){
+      //       rotateWide(15, false);
+      //       pickUpRight();
+      //       idol_num = 6;
+      //       break;
+      //     }
+      // }
+      if(right.getValue() == 1){
+        brake1(60, motor1, true);
+        delay(1000);
+        pickUpRight();
+        idol_num = 6;
+        break;
       }
     }
-    //rotateWide2(130, false);
-    int startTimePed = millis();
-    while(startTimePed - millis() < 1000) {
-      motor2.powerMotor(15);
-    }
-    motor2.powerMotor(0);
-    rotate(140, false);
-  } else if(idol_num == 8){  //going up the bridge
+    rotateWide2(120, false); //changed from 120 t0 125
+  } else if(idol_num == 6){  //going up the bridge
     encoder1.reset();
     encoder2.reset();
-    while (encoder1.getPos() < cm_to_clicks(180)) {
-      zigzag(30, 10);
-      if(encoder1.getPos() > cm_to_clicks(100)){
-        if(right.getValue() == true){
-          break;
-        }
-      }
+    while(encoder1.getPos() < cm_to_clicks(15)){
+      goStraight(pidmotion, 1000, 30);
     }
-    manualBrake(60, 60, false, false);
-    while(goStraight(pidmotion, 180, 30)) {}
+    while (encoder1.getPos() < cm_to_clicks(130)) {
+      zigzag(28, 11, 1250);
+    }
+    while(encoder1.getPos() < cm_to_clicks(165)){
+      zigzag2(28, 11, 1000);
+    }
     brake(true);
-    delay(2000);
-    rotate(15, false);
-    move(26);
-    idol_num = 9;
-  } else if(idol_num == 9) { 
+    delay(1000);
+    move(20); //originally 15
+    // rotate(5, true);
+    // delay(1000);
+    // move(25);
+    //while(goStraight(pidmotion, 180, 30)){}
+    //brake(true);
+    idol_num = 7;
+  } else if(idol_num == 7) { 
     rotateWide(30, false);
     delay(1000);
     while(spinWide(5000, 20, false)) {
       if(millis() - sonar_r.lastUse > 60){
         int dist = sonar_r.getDistance();
-          if(dist < 17 && dist > 9){
-            rotateWide(12, false);
-            pickUpRightNoHall();
+          if(dist < 17 && dist > 8){
+            rotateWide(10, false);
+            pickUpGold();
             break;
           }
       }
     }
     delay(1000);
-    reverse(3);
+    //reverse(5); //changed from 3 to 5
+    //delay(1000);
+    //rotate(30, false);
+    //delay(1000);
+    //reverse(10);
+    //delay(1000);
+    //rotate(150, false);
+    rotate(90, true);
+    delay(500);
+    move(7);
+    delay(500);
+    rotate(90, true);
     delay(1000);
-    rotate(30, false);
-    delay(1000);
-    reverse(10);
-    delay(1000);
-    rotate(150, false);
-    delay(1000);
-    reverse(30);
+    reverse(18);
+    delay(1500);
     zipline.send();
     while(zipline.receive() == false){}
-    while(goStraight(pidmotion, cm_to_clicks(8), 12)){}
+    //while(goStraight(pidmotion, cm_to_clicks(4), 10)){}
+    int start = millis();
+    while (millis() - start < 2000) {
+        motor1.powerMotor(15);
+        motor2.powerMotor(15);
+    }
+    motor1.powerMotor(0);
+    motor2.powerMotor(0);
+    //manualBrake(30, 30, false, false);
     zipline.send();
     idol_num = 69;
   }
