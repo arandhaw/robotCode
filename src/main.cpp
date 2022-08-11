@@ -250,7 +250,7 @@ void loop(){
         break;
       }
     }
-    rotateWide2(120, false);
+    rotateWide2(120, false); //changed from 120 t0 125
   } else if(idol_num == 6){  //going up the bridge
     encoder1.reset();
     encoder2.reset();
@@ -265,7 +265,7 @@ void loop(){
     }
     brake(true);
     delay(1000);
-    move(15);
+    move(20); //originally 15
     // rotate(5, true);
     // delay(1000);
     // move(25);
@@ -279,7 +279,7 @@ void loop(){
       if(millis() - sonar_r.lastUse > 60){
         int dist = sonar_r.getDistance();
           if(dist < 17 && dist > 8){
-            rotateWide(9, false);
+            rotateWide(10, false);
             pickUpGold();
             break;
           }
