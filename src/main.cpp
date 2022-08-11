@@ -49,6 +49,7 @@ RunOnce a;
 void setup(){
   setup_OLED();
   delay(250);
+  
 }
 
 int idol_num = 0; //global variable to keep track of state
@@ -92,7 +93,7 @@ void loop(){
     if( encoder1.getPos() < cm_to_clicks(80) ){
       if (pid_tape_45.error == -100 && chickenWire == 0) {
         chickenWire = 1;
-        brake(true);
+        //brake(true); //COMMENTED THIS OUT
         //delay(1000);
       } 
       if (chickenWire == 1) {
@@ -163,11 +164,11 @@ void loop(){
       //   manualBrake(40, 40, true, false);
       // }
        IRFollow(pid_ir, 40);
-      if(millis() - timer > 1000){
+      if(millis() - timer > 1500){
         if(millis() - sonar_r.lastUse > 60){
           int dist = sonar_r.getDistance();
           if(dist < 25 && dist > 6){
-            move(4);
+            move(4.5);
             pickUpRight();
             idol_num = 3;
         }
@@ -177,10 +178,10 @@ void loop(){
       if(var == 0){
         rotate90(false);
        // delay(1000);
-        reverse(2.5);
+        reverse(6);
         encoder1.reset();
         encoder2.reset();
-        while(spinWide(2300, 40, false)){}
+        while(spinWide(2400, 40, false)){}
         brake1(80, motor1, true);
        // delay(1000);
         encoder1.reset();
@@ -221,7 +222,7 @@ void loop(){
       encoder1.reset();
       encoder2.reset();
       
-      while(goStraight(pidmotion, cm_to_clicks(18), 10)){}
+      while(goStraight(pidmotion, cm_to_clicks(25), 10)){}
 
 
       idol_num = 5;
@@ -245,7 +246,7 @@ void loop(){
     motor2.powerMotor(0);
 
   } else if( idol_num == 6){
-    delay(2500);
+    delay(1000);
     while(right.getValue() == 1){  test_edge(); }
     zipline.send();
     while(zipline.receive() == false){}
@@ -256,7 +257,7 @@ void loop(){
     zipline.send();
     while(zipline.receive() == false){}
     move(7);
-    delay(1000);
+    delay(500);
     while(spinWide(10000, 30, false)){
       // if(millis() - sonar_r.lastUse > 60){
       //     int dist = sonar_r.getDistance();
@@ -269,7 +270,7 @@ void loop(){
       // }
       if(right.getValue() == 1){
         brake1(60, motor1, true);
-        delay(1000);
+        delay(500);
         pickUpRight();
         idol_num = 8;
         break;
@@ -288,12 +289,12 @@ void loop(){
     // while(encoder1.getPos() < cm_to_clicks(165)){
     //   zigzag2(28, 11, 1000);
     // }
-    while (encoder1.getPos() < cm_to_clicks(175)) {
+    while (encoder1.getPos() < cm_to_clicks(177)) {
       theChristian(pidmotion, 3, 0, encoder1, encoder2);
     }
     //rotate(6, false);
     brake(true);
-    delay(1000);
+    delay(500);
     //move(20); //originally 15
     // rotate(5, true);
     // delay(1000);
@@ -303,7 +304,7 @@ void loop(){
     idol_num = 9;
   } else if(idol_num == 9) { 
     rotateWide(30, false);
-    delay(1000);
+    delay(500);
     while(spinWide(5000, 20, false)) {
       if(millis() - sonar_r.lastUse > 60){
         int dist = sonar_r.getDistance();
@@ -323,13 +324,13 @@ void loop(){
     //delay(1000);
     //rotate(150, false);
     rotate(90, true);
-    delay(500);
+    delay(250);
     move(7);
-    delay(500);
+    delay(250);
     rotate(90, true);
-    delay(1000);
-    reverse(18);
-    delay(1500);
+    delay(250);
+    reverse(18.5); //18 was perfect 
+    delay(750);
     zipline.send();
     while(zipline.receive() == false){}
     //while(goStraight(pidmotion, cm_to_clicks(4), 10)){}

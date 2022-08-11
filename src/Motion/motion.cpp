@@ -11,7 +11,7 @@ bool goStraight(PID &pid, int dist, int speed){
     float adjustment = pid.KP*pid.error;
     motor1.powerMotor(speed + round( adjustment ), true);
     motor2.powerMotor(speed - round( adjustment ), true);
-    OLED_manual3(encoder1.getSpeed(), pid.error, pid.totalSquaredError);
+    // OLED_manual3(encoder1.getSpeed(), pid.error, pid.totalSquaredError);
     if(encoder1.getPos() <= dist)
         return true;
     else {
@@ -36,8 +36,8 @@ bool spin(PID &pid, int dist, int speed, bool dir){
 
     motor1.powerMotor(speed + round( adjustment ), !dir);
     motor2.powerMotor(speed - round( adjustment ), dir);
-    OLED_manual2(pid.pValue(), pid.iValue(), pid.dValue());
-    //OLED_manual3(encoder1.getSpeed(), pid.error, 0);
+    // OLED_manual2(pid.pValue(), pid.iValue(), pid.dValue());
+    //// OLED_manual3(encoder1.getSpeed(), pid.error, 0);
     
     if(abs( encoder1.getPos() ) <= dist)
         return true;
@@ -52,14 +52,14 @@ bool spinWide(int dist, int speed, bool dir){
     
     if(dir == false){
       motor1.powerMotor(speed, true);
-      OLED_manual3(encoder1.getSpeed(), 0, 0);
+      // OLED_manual3(encoder1.getSpeed(), 0, 0);
       if(abs( encoder1.getPos() ) <= dist){
         return true;
       } else { return false; }
 
     } else {
       motor2.powerMotor(speed, true);
-      OLED_manual3(encoder2.getSpeed(), 0, 0);
+      // OLED_manual3(encoder2.getSpeed(), 0, 0);
       if(abs( encoder2.getPos() ) <= dist){
         return true;
       } else { 
@@ -81,7 +81,7 @@ bool goBackwards(PID &pid, int dist, int speed){
     float adjustment = pid.KP*pid.error;
     motor1.powerMotor(speed + round( adjustment ), false);
     motor2.powerMotor(speed - round( adjustment ), false);
-    OLED_manual3(encoder1.getSpeed(), pid.error, pid.totalSquaredError);
+    // OLED_manual3(encoder1.getSpeed(), pid.error, pid.totalSquaredError);
     if(abs( encoder1.getPos() )<= dist)
         return true;
     else {
@@ -142,7 +142,7 @@ void stop(PID &pid, int final_pos, Encoder enc, Motor motor){
 
     int pwm = pid.pValue() + pid.iValue() + dValue;
     motor.powerMotor( pwm );
-    OLED_manual3(enc.getPos(), pid.error, dValue);
+    // OLED_manual3(enc.getPos(), pid.error, dValue);
 }
 
 int cm_to_clicks(float cm){
@@ -258,7 +258,7 @@ bool spinWide2(int dist, int speed, bool dir){
     
     if(dir == false){
       motor2.powerMotor(speed, false);
-      OLED_manual3(encoder1.getSpeed(), 0, 0);
+      // OLED_manual3(encoder1.getSpeed(), 0, 0);
       if(abs( encoder2.getPos() ) <= dist){
         return true;
       } else { 
@@ -268,7 +268,7 @@ bool spinWide2(int dist, int speed, bool dir){
 
     } else {
       motor1.powerMotor(speed, false);
-      OLED_manual3(encoder1.getSpeed(), 0, 0);
+      // OLED_manual3(encoder1.getSpeed(), 0, 0);
       if(abs( encoder1.getPos() ) <= dist){
         return true;
       } else { 

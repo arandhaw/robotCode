@@ -198,5 +198,5 @@ int Encoder::getCount(){
 }
 
 void Encoder::testCounters(){
-    OLED_manual(count1, count2/2, count3, count4/2);
+    // OLED_manual(count1, count2/2, count3, count4/2);
 }
