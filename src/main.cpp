@@ -45,15 +45,20 @@ void ride();
 void doZipline();
 //setup function
 
+int state = 7;
+
 void setup(){
   pinMode(OUTPUT_PIN, OUTPUT);
   digitalWrite(OUTPUT_PIN, LOW); //initialize output pin
   inputValue = false;
   delay(1000);
+  if(state == 7){
+    raiseZipline(50); // remove later
+    delay(3000);
+  }
   
 }
 
-int state = 1;
 
 //main loop for program
 void loop(){
@@ -80,8 +85,6 @@ void loop(){
     sendMessage();
     state++;
   } else if(state == 7){
-    raiseZipline(50); // remove later
-    delay(3000);
     lowerTime(2000);
     zipMotor.powerMotor(100);
     delay(2000);
@@ -98,7 +101,7 @@ void loop(){
     sendMessage();
     state++;
   } else if(state == 11){
-    lowerTime(3500);
+    lowerTime(3150);
     sendMessage();
     state++;
   } else if(state == 13){
@@ -106,8 +109,8 @@ void loop(){
     sendMessage();
     state++;
   } else if(state == 15){
-    lowerTime(3000);
-    rideZipline(200);
+    lowerTime(3500);
+    rideZipline(220);
     state++;
 
   } else {
