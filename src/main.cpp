@@ -258,15 +258,15 @@ void loop(){
       goStraight(pidmotion, 1000, 30);
     }
     while (encoder1.getPos() < cm_to_clicks(130)) {
-      zigzag(28, 10, 1250);
+      zigzag(28, 11, 1250);
     }
     while(encoder1.getPos() < cm_to_clicks(165)){
-      zigzag2(28, 10, 1000);
+      zigzag2(28, 11, 1000);
     }
     brake(true);
     delay(1000);
     move(15);
-    //rotate(5, false);
+    // rotate(5, true);
     // delay(1000);
     // move(25);
     //while(goStraight(pidmotion, 180, 30)){}
@@ -279,7 +279,7 @@ void loop(){
       if(millis() - sonar_r.lastUse > 60){
         int dist = sonar_r.getDistance();
           if(dist < 17 && dist > 8){
-            rotateWide(8, false);
+            rotateWide(9, false);
             pickUpGold();
             break;
           }
@@ -293,9 +293,13 @@ void loop(){
     //reverse(10);
     //delay(1000);
     //rotate(150, false);
-    rotate(190, true);
+    rotate(90, true);
+    delay(500);
+    move(7);
+    delay(500);
+    rotate(90, true);
     delay(1000);
-    reverse(20);
+    reverse(18);
     delay(1500);
     zipline.send();
     while(zipline.receive() == false){}

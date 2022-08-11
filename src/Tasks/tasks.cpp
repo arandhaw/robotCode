@@ -113,7 +113,7 @@ void pickUpGold(){
   delay(500);
   claw.move(174); //close claw
   delay(1000);
-  arm.move(620); 
+  arm.move(600); 
 }
 
 
