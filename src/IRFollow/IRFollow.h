@@ -18,6 +18,8 @@ extern DigitalSensor right;
 extern DigitalSensor left;
 
 void IRFollow(PID &pid, int speed);
-void zigzag(int speed, int p);
+void zigzag(int speed, int p, int time); //1500 previously
+void zigzag2(int speed, int p, int time);
+void zag();
 
 #endif

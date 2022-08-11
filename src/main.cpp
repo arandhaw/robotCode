@@ -233,14 +233,21 @@ void loop(){
     move(5);
     delay(1000);
     while(spinWide(10000, 30, false)){
-      if(millis() - sonar_r.lastUse > 60){
-          int dist = sonar_r.getDistance();
-          if(dist < 25 && dist > 8){
-            rotateWide(15, false);
-            pickUpRight();
-            idol_num = 6;
-            break;
-          }
+      // if(millis() - sonar_r.lastUse > 60){
+      //     int dist = sonar_r.getDistance();
+      //     if(dist < 25 && dist > 8){
+      //       rotateWide(15, false);
+      //       pickUpRight();
+      //       idol_num = 6;
+      //       break;
+      //     }
+      // }
+      if(right.getValue() == 1){
+        brake1(60, motor1, true);
+        delay(1000);
+        pickUpRight();
+        idol_num = 6;
+        break;
       }
     }
     rotateWide2(120, false);
@@ -250,13 +257,18 @@ void loop(){
     while(encoder1.getPos() < cm_to_clicks(15)){
       goStraight(pidmotion, 1000, 30);
     }
-    while (encoder1.getPos() < cm_to_clicks(150)) {
-      zigzag(30, 10);
+    while (encoder1.getPos() < cm_to_clicks(130)) {
+      zigzag(28, 10, 1250);
+    }
+    while(encoder1.getPos() < cm_to_clicks(165)){
+      zigzag2(28, 10, 1000);
     }
     brake(true);
-    rotate(5, false);
     delay(1000);
-    move(27);
+    move(15);
+    //rotate(5, false);
+    // delay(1000);
+    // move(25);
     //while(goStraight(pidmotion, 180, 30)){}
     //brake(true);
     idol_num = 7;
@@ -267,26 +279,35 @@ void loop(){
       if(millis() - sonar_r.lastUse > 60){
         int dist = sonar_r.getDistance();
           if(dist < 17 && dist > 8){
-            rotateWide(11, false);
+            rotateWide(8, false);
             pickUpGold();
             break;
           }
       }
     }
     delay(1000);
-    reverse(5); //changed from 3 to 5
+    //reverse(5); //changed from 3 to 5
+    //delay(1000);
+    //rotate(30, false);
+    //delay(1000);
+    //reverse(10);
+    //delay(1000);
+    //rotate(150, false);
+    rotate(190, true);
     delay(1000);
-    rotate(30, false);
-    delay(1000);
-    reverse(10);
-    delay(1000);
-    rotate(150, false);
-    delay(1000);
-    reverse(30);
+    reverse(20);
+    delay(1500);
     zipline.send();
     while(zipline.receive() == false){}
-    while(goStraight(pidmotion, cm_to_clicks(4), 10)){}
-    manualBrake(30, 30, false, false);
+    //while(goStraight(pidmotion, cm_to_clicks(4), 10)){}
+    int start = millis();
+    while (millis() - start < 2000) {
+        motor1.powerMotor(15);
+        motor2.powerMotor(15);
+    }
+    motor1.powerMotor(0);
+    motor2.powerMotor(0);
+    //manualBrake(30, 30, false, false);
     zipline.send();
     idol_num = 69;
   }
