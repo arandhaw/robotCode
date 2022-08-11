@@ -93,6 +93,21 @@ void pickUpRightNoHall(){
 
 }
 
+void pickUpGold(){
+  
+  int start; 
+  arm.move(620); //raised position
+  delay(500);
+  claw.move(573); //open claw
+  delay(500);
+  arm.move(205);
+  delay(500);
+  claw.move(174); //close claw
+  delay(1000);
+  pwm_start(PB_6, 100, 17, TimerCompareFormat_t::PERCENT_COMPARE_FORMAT); //raise arm
+
+}
+
 
 void resetClaw(){
   claw.move(573); //open claw

@@ -227,7 +227,7 @@ void loop(){
     idol_num = 5;
 
   } else if (idol_num == 5){
-    reverse(10);
+    reverse(11);
     zipline.send();
     while(zipline.receive() == false){}
     move(5);
@@ -243,7 +243,7 @@ void loop(){
           }
       }
     }
-    rotateWide2(125, false);
+    rotateWide2(120, false);
   } else if(idol_num == 6){  //going up the bridge
     encoder1.reset();
     encoder2.reset();
@@ -254,9 +254,9 @@ void loop(){
       zigzag(30, 10);
     }
     brake(true);
-    delay(2000);
-    rotate(12, false);
-    move(30);
+    rotate(5, false);
+    delay(1000);
+    move(27);
     //while(goStraight(pidmotion, 180, 30)){}
     //brake(true);
     idol_num = 7;
@@ -266,15 +266,15 @@ void loop(){
     while(spinWide(5000, 20, false)) {
       if(millis() - sonar_r.lastUse > 60){
         int dist = sonar_r.getDistance();
-          if(dist < 17 && dist > 9){
-            rotateWide(12, false);
-            pickUpRightNoHall();
+          if(dist < 17 && dist > 8){
+            rotateWide(11, false);
+            pickUpGold();
             break;
           }
       }
     }
     delay(1000);
-    reverse(3);
+    reverse(5); //changed from 3 to 5
     delay(1000);
     rotate(30, false);
     delay(1000);
@@ -285,7 +285,8 @@ void loop(){
     reverse(30);
     zipline.send();
     while(zipline.receive() == false){}
-    while(goStraight(pidmotion, cm_to_clicks(8), 12)){}
+    while(goStraight(pidmotion, cm_to_clicks(4), 10)){}
+    manualBrake(30, 30, false, false);
     zipline.send();
     idol_num = 69;
   }
