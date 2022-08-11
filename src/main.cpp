@@ -49,9 +49,10 @@ RunOnce a;
 void setup(){
   setup_OLED();
   delay(250);
+
 }
 
-int idol_num = 41; //global variable to keep track of state
+int idol_num = 0; //global variable to keep track of state
 int chickenWire = 0;
 int var = 0; 
 int state = 0;
@@ -78,7 +79,7 @@ void loop(){
         if(dist < 30 && dist > 8){
           move(2);
           //brake(true);
-          delay(1000);
+         // delay(1000);
           pickUpRight();
           idol_num = 1;
           encoder1.reset();
@@ -93,7 +94,7 @@ void loop(){
       if (pid_tape_45.error == -100 && chickenWire == 0) {
         chickenWire = 1;
         brake(true);
-        delay(1000);
+        //delay(1000);
       } 
       if (chickenWire == 1) {
         rotate(8, false);
@@ -117,14 +118,14 @@ void loop(){
           pickUpRight();
           encoder1.reset();
           encoder2.reset();
-          reverse(4.5);
+          reverse(4.8);
           while(zip2.once()){
             zipline.send();
             while(zipline.receive() == false){}
           }
           
           idol_num = 2;
-          delay(1500);
+         // delay(1500);
           motor1.powerMotor(15);
           int start = millis();
           while(millis() - start < 4000){
@@ -135,16 +136,16 @@ void loop(){
           //  }
           }
           brake1(35, motor1, true);
-          delay(1000);
+          //delay(1000);
           encoder1.reset();
           encoder2.reset();
           move(20);
           //delay(1000);
-          delay(1000);
+         // delay(1000);
           rotate(10, false);
-          delay(1000);
+         // delay(1000);
            move(12);
-          delay(1000);
+         // delay(1000);
           idol_num = 2;
           var = 0;
           encoder1.reset();
@@ -156,7 +157,7 @@ void loop(){
       while(zip3.once()){
         timer = millis();
         zipline.send();
-        while(zipline.receive() == false){}
+        //while(zipline.receive() == false){}
       }
       // while(ir1.getValue() < 500 && ir2.getValue() < 500){
       //   spin(pidmotion, 10, 15, false);
@@ -167,7 +168,7 @@ void loop(){
         if(millis() - sonar_r.lastUse > 60){
           int dist = sonar_r.getDistance();
           if(dist < 25 && dist > 6){
-            move(3.5);
+            move(4);
             pickUpRight();
             idol_num = 3;
         }
@@ -176,13 +177,13 @@ void loop(){
   } else if (idol_num == 3){
       if(var == 0){
         rotate90(false);
-        delay(1000);
-        reverse(2.5);
+       // delay(1000);
+        reverse(1.5);
         encoder1.reset();
         encoder2.reset();
         while(spinWide(2350, 40, false)){}
         brake1(80, motor1, true);
-        delay(1000);
+       // delay(1000);
         encoder1.reset();
         encoder2.reset();
         var++;
@@ -245,7 +246,6 @@ void loop(){
     motor2.powerMotor(0);
 
   } else if( idol_num == 6){
-    while(zipline.receive() == false){ test_edge();  }
     delay(2500);
     while(right.getValue() == 1){  test_edge(); }
     zipline.send();
@@ -253,10 +253,10 @@ void loop(){
     idol_num = 7;
 
   } else if (idol_num == 7){
-    reverse(10);
+    reverse(12);
     zipline.send();
     while(zipline.receive() == false){}
-    move(5);
+    move(7);
     delay(1000);
     while(spinWide(10000, 30, false)){
       if(millis() - sonar_r.lastUse > 60){
@@ -269,11 +269,17 @@ void loop(){
           }
       }
     }
-    rotateWide2(130, false);
+    //rotateWide2(130, false);
+    int startTimePed = millis();
+    while(startTimePed - millis() < 1000) {
+      motor2.powerMotor(15);
+    }
+    motor2.powerMotor(0);
+    rotate(140, false);
   } else if(idol_num == 8){  //going up the bridge
     encoder1.reset();
     encoder2.reset();
-    while (encoder1.getPos() < cm_to_clicks(170)) {
+    while (encoder1.getPos() < cm_to_clicks(180)) {
       zigzag(30, 10);
       if(encoder1.getPos() > cm_to_clicks(100)){
         if(right.getValue() == true){
@@ -282,8 +288,10 @@ void loop(){
       }
     }
     manualBrake(60, 60, false, false);
+    while(goStraight(pidmotion, 180, 30)) {}
+    brake(true);
     delay(2000);
-    rotate(18, false);
+    rotate(15, false);
     move(26);
     idol_num = 9;
   } else if(idol_num == 9) { 
