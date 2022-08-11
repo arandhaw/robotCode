@@ -21,5 +21,6 @@ void IRFollow(PID &pid, int speed);
 void zigzag(int speed, int p, int time); //1500 previously
 void zigzag2(int speed, int p, int time);
 void zag();
+void theChristian(PID &pid, int numOfCorrections, double finalCorAngle, Encoder encoder1, Encoder encoder2);
 
 #endif

@@ -49,7 +49,6 @@ RunOnce a;
 void setup(){
   setup_OLED();
   delay(250);
-
 }
 
 int idol_num = 0; //global variable to keep track of state
@@ -120,8 +119,7 @@ void loop(){
           encoder2.reset();
           reverse(4.8);
           while(zip2.once()){
-            zipline.send();
-            while(zipline.receive() == false){}
+            zipline.send();            
           }
           
           idol_num = 2;
@@ -136,6 +134,7 @@ void loop(){
           //  }
           }
           brake1(35, motor1, true);
+          while(zipline.receive() == false){}
           //delay(1000);
           encoder1.reset();
           encoder2.reset();
@@ -178,10 +177,10 @@ void loop(){
       if(var == 0){
         rotate90(false);
        // delay(1000);
-        reverse(1.5);
+        reverse(2.5);
         encoder1.reset();
         encoder2.reset();
-        while(spinWide(2350, 40, false)){}
+        while(spinWide(2300, 40, false)){}
         brake1(80, motor1, true);
        // delay(1000);
         encoder1.reset();
@@ -272,33 +271,37 @@ void loop(){
         brake1(60, motor1, true);
         delay(1000);
         pickUpRight();
-        idol_num = 6;
+        idol_num = 8;
         break;
       }
     }
     rotateWide2(120, false); //changed from 120 t0 125
-  } else if(idol_num == 6){  //going up the bridge
+  } else if(idol_num == 8){  //going up the bridge
     encoder1.reset();
     encoder2.reset();
-    while(encoder1.getPos() < cm_to_clicks(15)){
-      goStraight(pidmotion, 1000, 30);
+    // while(encoder1.getPos() < cm_to_clicks(15)){
+    //   goStraight(pidmotion, 1000, 30);
+    // }
+    // while (encoder1.getPos() < cm_to_clicks(130)) {
+    //   zigzag(28, 11, 1250);
+    // }
+    // while(encoder1.getPos() < cm_to_clicks(165)){
+    //   zigzag2(28, 11, 1000);
+    // }
+    while (encoder1.getPos() < cm_to_clicks(175)) {
+      theChristian(pidmotion, 3, 0, encoder1, encoder2);
     }
-    while (encoder1.getPos() < cm_to_clicks(130)) {
-      zigzag(28, 11, 1250);
-    }
-    while(encoder1.getPos() < cm_to_clicks(165)){
-      zigzag2(28, 11, 1000);
-    }
+    //rotate(6, false);
     brake(true);
     delay(1000);
-    move(20); //originally 15
+    //move(20); //originally 15
     // rotate(5, true);
     // delay(1000);
     // move(25);
     //while(goStraight(pidmotion, 180, 30)){}
     //brake(true);
-    idol_num = 7;
-  } else if(idol_num == 7) { 
+    idol_num = 9;
+  } else if(idol_num == 9) { 
     rotateWide(30, false);
     delay(1000);
     while(spinWide(5000, 20, false)) {
