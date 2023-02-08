@@ -1,5 +1,7 @@
 #include "Sonar.h"
 
+
+
 Sonar::Sonar(int trigPin, int echoPin){
     this->trigPin = trigPin;
     this->echoPin = echoPin;

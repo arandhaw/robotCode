@@ -1,16 +1,15 @@
 #include "tests.h"
 
+
 void test_servos(){
     pickUpRight();
 }
 
-DataBuffer<int> test_data(5, 100);
 void test_pickup(){
     if(millis() - sonar_r.lastUse > 60){
-        test_data.add(sonar_r.getDistance());
-        if(test_data.runningAvg(3) < 25){ 
+        int dist = sonar_r.getDistance();
+        if(dist < 25 && dist > 8){ 
           pickUpRight();
-          test_data.reset(100);
         }
     }
 }
@@ -19,7 +18,8 @@ void test_sonar(){
     OLED("Sonar Distance", sonar_r.getDistance());
 }
 void test_counters(){
-    encoder1.testCounters();
+    OLED("Sonar Distance", encoder1.getCount());
+    
 }
 void test_encoders(){
     OLED_manual(encoder1.getPos(), encoder1.getSpeed(), encoder2.getPos(), encoder2.getSpeed());
@@ -41,4 +41,8 @@ void test_IR(){
     delay(1);
     int num2 = ir2.getValue();
     OLED2("IR1, IR2:", num1, num2);
+}
+
+void test_edge(){
+    OLED2("Right, left", right.getValue(), left.getValue());
 }

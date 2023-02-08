@@ -10,10 +10,9 @@
 #include <Sonar.h>
 #include <DataBuffer.hpp>
 #include <IRSensor.h>
-
-#include "Tasks/tasks.h"
+#include "Claw/Claw.h"
 #include "Motion/motion.h"
-#include "tapeFollow/tapeFollow.h"
+#include "TapeFollow/tapeFollow.h"
 
 extern PID pid_tape_45;
 extern Encoder encoder1;
@@ -24,6 +23,8 @@ extern Sonar sonar_r;
 extern ReflectSensor R1; //left
 extern ReflectSensor R2; //middle
 extern ReflectSensor R3; //right
+extern DigitalSensor right; //reflectsensor on right
+extern DigitalSensor left; //reflectsensor on left
 extern IRSensor ir1;
 extern IRSensor ir2;
 
@@ -36,4 +37,5 @@ void test_encoders();
 void test_tapefollowing();
 void test_motors();
 void test_IR();
+void test_edge();
 #endif

@@ -33,7 +33,7 @@ void tapeFollow(PID &pid, int speed, ReflectSensor R1, ReflectSensor R2, Reflect
         rightMotor.powerMotor(speed, true); //error is indeterminate
         //failSafe++;
         //if(failSafe > FAIL_LIMIT){  failure(leftMotor, rightMotor);  }
-        return; //early return statement
+        return;
     }
 
     //updating state variables
@@ -63,6 +63,25 @@ void failure(Motor m1, Motor m2){
     m2.powerMotor(0, true);
 }
 
-//int round(float num){
-  //  return (int)(num < 0 ? (num - 0.5) : (num + 0.5));
-//}
+void findTape(ReflectSensor R1, ReflectSensor R2, ReflectSensor R3) {
+  int startingTime = millis();
+  if (R1.getDigitalValue() == 0 && R2.getDigitalValue() == 0 && R3.getDigitalValue() == 0) {
+    motor1.powerMotor(20, true);
+    motor2.powerMotor(20, false);
+    while (R1.getDigitalValue() == 0 && R2.getDigitalValue() == 0 && R3.getDigitalValue() == 0 && millis() - startingTime < 2000) {
+      if (R1.getDigitalValue() == 1 || R2.getDigitalValue() == 1 || R3.getDigitalValue() == 1) {
+        return;
+      }
+    }
+    motor1.powerMotor(20, false);
+    motor2.powerMotor(20, true);
+    startingTime = millis();
+    while (R1.getDigitalValue() == 0 && R2.getDigitalValue() == 0 && R3.getDigitalValue() == 0 && millis() - startingTime < 4000) {
+      if (R1.getDigitalValue() == 1 || R2.getDigitalValue() == 1 || R3.getDigitalValue() == 1) {
+        return;
+      }
+    }
+  } else {
+    return;
+  }
+}

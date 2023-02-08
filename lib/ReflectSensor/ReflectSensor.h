@@ -3,7 +3,7 @@
 #define REFLECT_SENSOR_H 
 
 #include <wire.h>
-#define THRESHOLD 250 //Changed to 200
+#define THRESHOLD 200 //Changed to 200
 
 // a class for analog Reflectance Sensors.
 

@@ -1,6 +1,8 @@
-//c++ libraries
+//C++ libraries
 #include <cmath>
+#include <SoftwareSerial.h>
 //self made libraries
+#include <Zipline.h>
 #include <OLED.h>
 #include <Arduino.h>
 #include <Encoders.h>
@@ -8,183 +10,268 @@
 #include <DataBuffer.hpp>
 #include <Sonar.h>
 #include <IRSensor.h>
+#include <servo.h>
+#include <DigitalSensor.h>
+#include <RunOnce.h>
 //program files
-// #include "sweep.h"
-#include "Tasks/tasks.h"
+#include "Claw/Claw.h"
 #include "Motion/motion.h"
-#include "tapeFollow/tapeFollow.h"
-#include "tests/tests.h"
+#include "TapeFollow/tapeFollow.h"
+#include "Tests/tests.h"
 #include "IRFollow/IRFollow.h"
+//SoftwareSerial myserial(PB11, PB10); //to communicate with bluepill
 
-// #include "runMotors.h" 
-// #include "testMotors.h" 
-
-//Servo myservo;
-
+Zipline zipline(PA10, PA11); //output pin, input pin
 ReflectSensor R1(PA7); //left
 ReflectSensor R2(PA6); //middle
 ReflectSensor R3(PA5); //right
-Motor motor1(PA0, PA_0, PA1, PA_1); //right motor (slower motor)
+DigitalSensor left(PB5);
+DigitalSensor right(PB4);
+Motor motor1(PA0, PA_0, PA1, PA_1); //right motor
 Motor motor2(PA2, PA_2, PA3, PA_3); //left motor
-Encoder encoder2(PB15, PB14, 2);
-Encoder encoder1(PB12, PB13, 1);
+Encoder encoder2(PB15, PB14);
+Encoder encoder1(PB12, PB13);
 Sonar sonar_r(PB3, PA15);
 IRSensor ir1(PB0, PA8);
 IRSensor ir2(PB1, PA8);
+servo arm(PB_6);
+servo claw(PB_7);
+DigitalSensor hall(PA12); //change
+DataBuffer<bool> sonar_bool(50, 0);
 DataBuffer<int> sonar_data(5, 100);
-PID pid_tape_45(10, 0, 5, 0);
-PID pid_ir(20, 0, 0, 0);
-
-void setup(){
-  setup_OLED(); 
-  // PID pidx(50, 0, 0, 1000);
-  // while(spin(pidx, 1100, 20, false)){}
-  // brake1(60, motor1, false);
-  // brake1(60, motor2, true);
-  // while(true);
-  // while(spin(pidx, 1160, 40, true)){}
-  // brake1(75, motor1, true);
-  // brake1(75, motor2, false);
-  // while(true){
-  // }
-  
-}
-
-int idol_num = 2; //global variable to keep track of state
-int var = 0; 
-int state = 0;
+PID pid_tape_45(10, 0, 5, 0); //set parameters for PID algorithms
+PID pid_ir(30, 0, 0, 0);
+PID pidmotion(40, 0, 0, 0);
 PID pid2(30, 0, 0, 1000);
 
+void setup(){
+  setup_OLED();
+  delay(250);
+}
+
+int state = 0; //decides state of robot
+int timer; //to store time variables
+//for blocks of code that must run only once
+RunOnce zip1, zip2, zip3, zip4, zip5, zip6, var1, var2, chicken;
+
 void loop(){
-  if(idol_num == 0){
-    if( encoder1.getPos() < cm_to_clicks(180)){
+
+  //raise zipline then start tapefollowing up hill, pick up first idol
+  if(state == 0){
+    while(zip1.once()){
+      zipline.send();
+      while(zipline.receive() == false){}
+      arm.move(620); //raise arm
+      timer = millis();
+    }
+    if(millis() - timer < 2000){
       tapeFollow(pid_tape_45, 45, R1, R2, R3, motor1, motor2);
     } else {
       tapeFollow(pid_tape_45, 45, R1, R2, R3, motor1, motor2);
-      if(millis() - sonar_r.lastUse > 60){
-        sonar_data.add(sonar_r.getDistance());
-        int dist = sonar_data.get(0);
-        if(dist < 20 && dist > 8){
-          move(5);
+      if(millis() - sonar_r.lastUse > 45){
+        int dist = sonar_r.getDistance();
+
+        if(dist < 30 && dist > 8){
+          move(2);
           pickUpRight();
-          idol_num = 1;
-          reverse(8);
+          state = 1;
+          encoder1.reset();
+          encoder2.reset();
+          reverse(5);
         }
       }
     }
-  } else if (idol_num == 1){
-    if( encoder1.getPos() < cm_to_clicks(60) ){
-      tapeFollow(pid_tape_45, 45, R1, R2, R3, motor1, motor2);
+
+  //cross chickenwire bridge, pick up 2nd idol, go under arch
+  } else if (state == 1){
+    if( encoder1.getPos() < cm_to_clicks(80) ){
+      if (pid_tape_45.error == -100 && chicken.once() == true) {
+        rotate(8, false);
+        move(18);
+        findTape(R1, R2, R3);
+        
+      } else {
+        tapeFollow(pid_tape_45, 45, R1, R2, R3, motor1, motor2);
+      }
     } else {
       tapeFollow(pid_tape_45, 45, R1, R2, R3, motor1, motor2);
-      if(millis() - sonar_r.lastUse > 60){
+      if(millis() - sonar_r.lastUse > 30){
+        
         int dist = sonar_r.getDistance();
+        if(dist < 22){ sonar_bool.add(true);
+        } else { sonar_bool.add(false); }
+
         if(dist < 25 && dist > 8){
-          move(5);
+          move(2);
           pickUpRight();
-          idol_num = 69;
-          reverse(9);
+          encoder1.reset();
+          encoder2.reset();
+          reverse(4.8);
+          while(zip2.once()){
+            zipline.send();            
+          }
+          motor1.powerMotor(15);
+          int start = millis();
+          while(millis() - start < 4000){}
+          brake1(35, motor1, true);
+          while(zipline.receive() == false){}
+          encoder1.reset();
+          encoder2.reset();
+          move(20);
+          rotate(10, false);
+          move(12);
+          state = 2;
+          encoder1.reset();
+          encoder2.reset();
           }
         }
       }
-  } else if (idol_num == 2){
-      IRFollow(pid_ir, 40);
-      if(encoder1.getPos() > cm_to_clicks(100)){
+
+  //begin following Infrared beacon - raise zipline arm
+  } else if (state == 2){
+      while(zip3.once()){
+        timer = millis();
+        zipline.send();
+      }
+       IRFollow(pid_ir, 40);
+      if(millis() - timer > 1500){
         if(millis() - sonar_r.lastUse > 60){
           int dist = sonar_r.getDistance();
-          if(dist < 22 && dist > 8){
-            move(7);
+          if(dist < 25 && dist > 6){
+            move(4.5);
             pickUpRight();
-            idol_num = 3;
+            state = 3;
         }
       }
     }  
-  } else if (idol_num == 3){
-      if(var == 0){
+
+  //turn around and move towards 4th idol
+  } else if (state == 3){
+      if(var1.once()){
         rotate90(false);
-        delay(1000);
-        move(10);
-        delay(1000);
+        reverse(6);
         encoder1.reset();
         encoder2.reset();
-        while(spinWide(2200, 40, false)){}
+        while(spinWide(2400, 40, false)){}
         brake1(80, motor1, true);
-        delay(1000);
         encoder1.reset();
         encoder2.reset();
-        var++;
       }
       goStraight(pid2, cm_to_clicks(200), 40);
       if(encoder1.getPos() > cm_to_clicks(30)){
         if(millis() - sonar_r.lastUse > 60){
           int dist = sonar_r.getDistance();
           if(dist < 25 && dist > 8){
-            move(5);
+            move(4);
             pickUpRight();
-            idol_num = 69;
+            state = 4;
           }
         }
       }
-  } else if (idol_num == 4){
-    if(encoder1.getPos() < cm_to_clicks(80) && var == 0){
-      goStraight(pid2, cm_to_clicks(300), 40);
-    } else {
-      if(var == 0){
-        stop_robot();
-        rotate(45, false);
-        move(14);
-        rotate(45, true);
-        var = 1;
+
+  //turn around and head toward zipline
+  } else if (state == 4){
+    if(var2.once()){
+      pid_ir.reset();
+      encoder1.reset();
+      encoder2.reset();
+      rotate(190, false);
+      encoder1.reset();
+      encoder2.reset(); 
+    }
+    IRFollow(pid_ir, 40);
+    if(encoder1.getPos() > cm_to_clicks(80)){
+      brake(true);
+      encoder1.reset();
+      encoder2.reset();
+      
+      while(goStraight(pidmotion, cm_to_clicks(25), 10)){}
+      state = 5;
+    }
+
+  //ascend zipline
+  } else if (state == 5) {
+      while(zip4.once()){
+        zipline.send();
+        while(zipline.receive() == false){}
+    }
+    state = 6;
+  //send zipline message once edge is seen
+  } else if( state == 6){
+    delay(1000);
+    while(right.getValue() == 1){  test_edge(); }
+    zipline.send();
+    while(zipline.receive() == false){}
+    state = 7;
+  
+  //dismount from zipline, begin manouvers for 5th idol
+  } else if (state == 7){
+    reverse(12);
+    zipline.send();
+    while(zipline.receive() == false){}
+    move(7);
+    delay(500);
+    while(spinWide(10000, 30, false)){
+      if(right.getValue() == 1){
+        brake1(60, motor1, true);
+        delay(500);
+        pickUpRight();
+        state = 8;
+        break;
       }
-      goStraight(pid2, cm_to_clicks(200), 40);
+    }
+    rotateWide2(120, false);
+
+  //going up the bridge with edge detection
+  } else if(state == 8){  
+    encoder1.reset();
+    encoder2.reset();
+    while (encoder1.getPos() < cm_to_clicks(177)) {
+      theChristian(pidmotion, 3, 0, encoder1, encoder2);
+    }
+    brake(true);
+    delay(500);
+    state = 9;
+
+  //pick up the golden idol and mount second zipline
+  } else if(state == 9) { 
+    rotateWide(30, false);
+    delay(500);
+    while(spinWide(5000, 20, false)) {
       if(millis() - sonar_r.lastUse > 60){
         int dist = sonar_r.getDistance();
-        if(dist < 25 && dist > 8){
-          move(5);
-          pickUpRight();
-          idol_num = 69;
+          if(dist < 17 && dist > 8){
+            rotateWide(10, false);
+            pickUpGold();
+            break;
           }
-        }
+      }
     }
-  } else if (idol_num == 69){
+    delay(1000);
+    rotate(90, true);
+    delay(250);
+    move(7);
+    delay(250);
+    rotate(90, true);
+    delay(250);
+    reverse(18.5);
+    delay(750);
+    zipline.send();
+    while(zipline.receive() == false){}
+    int start = millis();
+    while (millis() - start < 2000) {
+        motor1.powerMotor(15);
+        motor2.powerMotor(15);
+    }
+    motor1.powerMotor(0);
+    motor2.powerMotor(0);
+    zipline.send();
+    state = 99;
+  }
+
+  //end of course
+  else if (state == 99){
     motor1.powerMotor(0);
     motor2.powerMotor(0);
   }
-
-  // if(idol_num == 10){
-  //   PID pid_1(30, 0, 0, 1000);
-  //   goStraight2(pid_1, cm_to_clicks(100), 10, encoder1, encoder2, motor1, motor2);
-
-  //   if(R1.getDigitalValue() == 1){
-  //     PID pid(30, 0, 0, 1000);
-  //     int d;
-  //     int L = 2;
-  //     encoder1.reset();
-  //     encoder2.reset();
-  //     while(goStraight2(pid, cm_to_clicks(10000), 10, encoder1, encoder2, motor1, motor2)){
-  //       if(R3.getDigitalValue() == 1){
-  //         d = encoder1.getPos();
-  //         stop_robot();
-  //         break;
-  //       }
-  //     }
-      
-  //     float angle = 180/PI*std::atan((float) d/L);
-  //     rotate(angle, false);
-  //     encoder1.reset();
-  //     encoder2.reset();
-  //     pid_1.reset();
-  //   }
-  // }
-  // motor1.powerMotor(50);
-  // motor2.powerMotor(50);
-  //OLED_manual(encoder1.getSpeed(), 0, encoder2.getSpeed(), 0);
-  //encoder1.testCounters();
-
 }
-
-
-
-// } else if (idol_num == 2){
-//     
-//     }

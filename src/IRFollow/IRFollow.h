@@ -7,12 +7,17 @@
 #include <PID.h>
 #include <IRSensor.h>
 #include <Arduino.h>
+#include <DigitalSensor.h>
+#include "Motion/motion.h"
 
 extern Motor motor1;
 extern Motor motor2;
 extern IRSensor ir1;
 extern IRSensor ir2;
+extern DigitalSensor right;
+extern DigitalSensor left;
 
 void IRFollow(PID &pid, int speed);
+void theChristian(PID &pid, int numOfCorrections, double finalCorAngle, Encoder encoder1, Encoder encoder2);
 
 #endif

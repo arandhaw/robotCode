@@ -5,27 +5,38 @@
 #include <PID.h>
 #include <OLED.h>
 #include <Motor.h>
+#include <Arduino.h>
 
 extern Encoder encoder1;
 extern Encoder encoder2;
 extern Motor motor1;
 extern Motor motor2;
 
+//functions that must be called continuously
 bool goStraight(PID &pid, int dist, int speed);
 bool goBackwards(PID &pid, int dist, int speed);
-void stop(PID &pid, int final_pos, Encoder enc, Motor motor);
-void brake(bool dir);
-void brake1(int duration, Motor mot, bool dir);
-void brakeSpin(int speed, bool dir);
 bool spin(PID &pid, int dist, int speed, bool dir);
 bool spinWide(int dist, int speed, bool dir);
+bool spinWide2(int dist, int speed, bool dir);
+
+//braking functions
+void brake(bool dir);
+void brake1(int duration, Motor mot, bool dir);
+void brakeSpin(bool dir);
+void manualBrake(int duration1, int duration2, int dir1, int dir2);
+
+//unit conversion functions
 int cm_to_clicks(float cm);
 int clicks_to_cm(float cm);
 
+//functions that are called once
+void move(float cm);
+void moveB(float cm);
+void reverse(float cm);
+void reverseB(float cm);
 void rotate(float angle, bool dir);
 void rotate90(bool dir);
-void move(float cm);
-void stop_robot();
-void reverse(float cm);
+void rotateWide(int angle, bool dir);
+void rotateWide2(int angle, bool dir);
 
 #endif

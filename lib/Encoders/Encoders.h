@@ -1,28 +1,28 @@
-#ifndef ENCODERS_H // name of file, all caps (this is called a guard - it must be 
+#ifndef ENCODER_H // name of file, all caps (this is called a guard - it must be 
                 // different for each header file, actual name is irrelevant)
-#define ENCODERS_H
+#define ENCODER_H
 #include <Arduino.h>
+#include <DataBuffer.hpp>
 
-void handle_interrupt1();
-void handle_interrupt2();
+#define SPEED_FACTOR 100000    //numerator in speed calculation (micros)
+#define TIME_LOWER_BOUND 20000   //time between pulses before speed is declared 0 (micros)
 
-void handle_interrupt3();
-void handle_interrupt4();
-
-
+//made as a better version of my original encoder class
 class Encoder{
     private:
         int pin1, pin2;
-        int num;
-        void calibrate();
-        
+        volatile int count, pos;  
+        bool dir;
+        DataBuffer<int> times; //holds times to determine speed
+        void ISR();
+
     public:
-        Encoder(int pin1, int pin2, int num);
-        int getAvgSpeed();
-        float getSpeed();
-        int getPos();
-        int getCount();
-        void reset();
-        void testCounters();
+        Encoder(int pin1, int pin2);
+        void reset();  //reset encoder
+        int getPos();  //get position (+/-)
+        int getCount(); //get total clicks received (distance)
+        bool getDir();  //get direction
+        float getSpeed(); //calculates speed - can be +/-
+        ~Encoder(); //destructor
 };
 #endif

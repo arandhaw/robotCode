@@ -1,6 +1,5 @@
 
-#ifndef DATA_BUFFER_HPP // name of file, all caps (this is called a guard - it must be 
-                // different for each header file, actual name is irrelevant)
+#ifndef DATA_BUFFER_HPP
 #define DATA_BUFFER_HPP
 //class that implements a fixed capacity queue
 //the last "size" data values are contained within DataBuffer
@@ -44,9 +43,9 @@ class DataBuffer{
         
         //average of last n data points
         float runningAvg(int n){
-            int sum;
+            float sum = 0;
             for(int i = 0; i < n; i++){
-                sum += get(n);
+                sum += get(i);
             }
             return (float) sum / n; 
         }

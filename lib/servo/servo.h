@@ -9,9 +9,9 @@
 class servo {
   private:
     PinName pin;
-    int current_pwm;
 
   public:
+    int current_pwm;
     servo(PinName pin);
     void move(int pwm);
     void moveSlowly(int pwm, int millis);
